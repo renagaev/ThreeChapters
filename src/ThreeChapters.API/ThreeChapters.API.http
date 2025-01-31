@@ -1,0 +1,6 @@
+@ThreeChapters.API_HostAddress = http://localhost:5089
+
+GET {{ThreeChapters.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
