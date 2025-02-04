@@ -1,0 +1,475 @@
+[
+  {
+    "title": "Бытие",
+    "titleVariants": [],
+    "chaptersCount": 50
+  },
+  {
+    "title": "Исход",
+    "titleVariants": [],
+    "chaptersCount": 40
+  },
+  {
+    "title": "Левит",
+    "titleVariants": [],
+    "chaptersCount": 27
+  },
+  {
+    "title": "Числа",
+    "titleVariants": [],
+    "chaptersCount": 36
+  },
+  {
+    "title": "Второзаконие",
+    "titleVariants": [],
+    "chaptersCount": 34
+  },
+  {
+    "title": "Иисус Навин",
+    "titleVariants": [
+      "Иисуса Навина",
+      "Иисуса Навин"
+    ],
+    "chaptersCount": 24
+  },
+  {
+    "title": "Судей",
+    "titleVariants": [
+      "Книга Судей"
+    ],
+    "chaptersCount": 21
+  },
+  {
+    "title": "Руфь",
+    "titleVariants": [
+      "Руфи"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "1-Царств",
+    "titleVariants": [
+      "Первая Царств",
+      "1 Царств"
+    ],
+    "chaptersCount": 31
+  },
+  {
+    "title": "2-Царств",
+    "titleVariants": [
+      "Вторая Царств",
+      "2 Царств"
+    ],
+    "chaptersCount": 24
+  },
+  {
+    "title": "3-Царств",
+    "titleVariants": [
+      "Третья Царств",
+      "3 Царств"
+    ],
+    "chaptersCount": 22
+  },
+  {
+    "title": "4-Царств",
+    "titleVariants": [
+      "Четвёртая Царств",
+      "4 Царств"
+    ],
+    "chaptersCount": 25
+  },
+  {
+    "title": "1-Паралипоменон",
+    "titleVariants": [
+      "Первая Паралипоменон",
+      "1 Пар",
+      "1 Паралипоменон"
+    ],
+    "chaptersCount": 29
+  },
+  {
+    "title": "2-Паралипоменон",
+    "titleVariants": [
+      "Вторая Паралипоменон",
+      "2 Пар",
+      "2 Паралипоменон"
+    ],
+    "chaptersCount": 36
+  },
+  {
+    "title": "Ездра",
+    "titleVariants": [
+      "Ездры"
+    ],
+    "chaptersCount": 10
+  },
+  {
+    "title": "Неемия",
+    "titleVariants": [
+      "Неемии"
+    ],
+    "chaptersCount": 13
+  },
+  {
+    "title": "Есфирь",
+    "titleVariants": [
+      "Есфири"
+    ],
+    "chaptersCount": 10
+  },
+  {
+    "title": "Иов",
+    "titleVariants": [
+      "Иова"
+    ],
+    "chaptersCount": 42
+  },
+  {
+    "title": "Псалтирь",
+    "titleVariants": [
+      "Псалмы",
+      "Псалом"
+    ],
+    "chaptersCount": 150
+  },
+  {
+    "title": "Притчи",
+    "titleVariants": [
+      "Притчи Соломона"
+    ],
+    "chaptersCount": 31
+  },
+  {
+    "title": "Екклесиаст",
+    "titleVariants": [
+      "Екклесиаста",
+      "Экклезиаст"
+    ],
+    "chaptersCount": 12
+  },
+  {
+    "title": "Песни Песней",
+    "titleVariants": [
+      "Песнь Соломона"
+    ],
+    "chaptersCount": 8
+  },
+  {
+    "title": "Исаия",
+    "titleVariants": [
+      "Исайя"
+    ],
+    "chaptersCount": 66
+  },
+  {
+    "title": "Иеремия",
+    "titleVariants": [
+      "Иеремии"
+    ],
+    "chaptersCount": 52
+  },
+  {
+    "title": "Плач Иеремии",
+    "titleVariants": [],
+    "chaptersCount": 5
+  },
+  {
+    "title": "Иезекииль",
+    "titleVariants": [
+      "Иезекииля"
+    ],
+    "chaptersCount": 48
+  },
+  {
+    "title": "Даниил",
+    "titleVariants": [
+      "Даниила"
+    ],
+    "chaptersCount": 12
+  },
+  {
+    "title": "Осия",
+    "titleVariants": [
+      "Осии"
+    ],
+    "chaptersCount": 14
+  },
+  {
+    "title": "Иоиль",
+    "titleVariants": [
+      "Иоиля"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "Амос",
+    "titleVariants": [
+      "Амоса"
+    ],
+    "chaptersCount": 9
+  },
+  {
+    "title": "Авдий",
+    "titleVariants": [
+      "Авдия"
+    ],
+    "chaptersCount": 1
+  },
+  {
+    "title": "Иона",
+    "titleVariants": [
+      "Ионы"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "Михей",
+    "titleVariants": [
+      "Михея"
+    ],
+    "chaptersCount": 7
+  },
+  {
+    "title": "Наум",
+    "titleVariants": [
+      "Наума"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "Аввакум",
+    "titleVariants": [
+      "Аввакума"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "Софония",
+    "titleVariants": [
+      "Софонии"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "Аггей",
+    "titleVariants": [
+      "Аггея"
+    ],
+    "chaptersCount": 2
+  },
+  {
+    "title": "Захария",
+    "titleVariants": [
+      "Захарии"
+    ],
+    "chaptersCount": 14
+  },
+  {
+    "title": "Малахия",
+    "titleVariants": [
+      "Малахии"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "Матфея",
+    "titleVariants": [
+      "Матвея"
+    ],
+    "chaptersCount": 28
+  },
+  {
+    "title": "Марка",
+    "titleVariants": [
+      "Марка"
+    ],
+    "chaptersCount": 16
+  },
+  {
+    "title": "Луки",
+    "titleVariants": [
+      "Луки"
+    ],
+    "chaptersCount": 24
+  },
+  {
+    "title": "Иоанна",
+    "titleVariants": [
+      "Иоана"
+    ],
+    "chaptersCount": 21
+  },
+  {
+    "title": "Деяния",
+    "titleVariants": [
+      "Деяния Апостолов"
+    ],
+    "chaptersCount": 28
+  },
+  {
+    "title": "Иакова",
+    "titleVariants": [
+      "Послание Иакова"
+    ],
+    "chaptersCount": 5
+  },
+  {
+    "title": "1-Петра",
+    "titleVariants": [
+      "Первое Петра",
+      "1 Петра"
+    ],
+    "chaptersCount": 5
+  },
+  {
+    "title": "2-Петра",
+    "titleVariants": [
+      "Второе Петра",
+      "2 Петра"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "1-Иоанна",
+    "titleVariants": [
+      "Первое Иоанна",
+      "1 Иоанна"
+    ],
+    "chaptersCount": 5
+  },
+  {
+    "title": "2-Иоанна",
+    "titleVariants": [
+      "Второе Иоанна",
+      "2 Иоанна"
+    ],
+    "chaptersCount": 1
+  },
+  {
+    "title": "3-Иоанна",
+    "titleVariants": [
+      "Третье Иоанна",
+      "3 Иоанна"
+    ],
+    "chaptersCount": 1
+  },
+  {
+    "title": "Иуды",
+    "titleVariants": [
+      "Послание Иуды"
+    ],
+    "chaptersCount": 1
+  },
+  {
+    "title": "Римлянам",
+    "titleVariants": [
+      "Римлянам"
+    ],
+    "chaptersCount": 16
+  },
+  {
+    "title": "1-Коринфянам",
+    "titleVariants": [
+      "Первое Коринфянам",
+      "1 Коринфянам"
+    ],
+    "chaptersCount": 16
+  },
+  {
+    "title": "2-Коринфянам",
+    "titleVariants": [
+      "Второе Коринфянам",
+      "2 Коринфянам"
+    ],
+    "chaptersCount": 13
+  },
+  {
+    "title": "Галатам",
+    "titleVariants": [
+      "Галатам"
+    ],
+    "chaptersCount": 6
+  },
+  {
+    "title": "Ефесянам",
+    "titleVariants": [
+      "Ефесянам"
+    ],
+    "chaptersCount": 6
+  },
+  {
+    "title": "Филиппийцам",
+    "titleVariants": [
+      "Филиппийцам"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "Колоссянам",
+    "titleVariants": [
+      "Колоссянам"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "1-Фессалоникийцам",
+    "titleVariants": [
+      "Первое Фессалоникийцам",
+      "1 Фессалоникийцам"
+    ],
+    "chaptersCount": 5
+  },
+  {
+    "title": "2-Фессалоникийцам",
+    "titleVariants": [
+      "Второе Фессалоникийцам",
+      "2 Фессалоникийцам"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "1-Тимофею",
+    "titleVariants": [
+      "Первое Тимофею",
+      "1 Тимофею"
+    ],
+    "chaptersCount": 6
+  },
+  {
+    "title": "2-Тимофею",
+    "titleVariants": [
+      "Второе Тимофею",
+      "2 Тимофею"
+    ],
+    "chaptersCount": 4
+  },
+  {
+    "title": "Титу",
+    "titleVariants": [
+      "Титу"
+    ],
+    "chaptersCount": 3
+  },
+  {
+    "title": "Филимону",
+    "titleVariants": [
+      "Филимону"
+    ],
+    "chaptersCount": 1
+  },
+  {
+    "title": "Евреям",
+    "titleVariants": [
+      "Евреям"
+    ],
+    "chaptersCount": 13
+  },
+  {
+    "title": "Откровение",
+    "titleVariants": [
+      "Апокалипсис",
+      "Откровение Иоанна"
+    ],
+    "chaptersCount": 22
+  }
+]
