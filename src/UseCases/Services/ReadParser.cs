@@ -10,7 +10,7 @@ public partial class ReadParser
 {
     public List<ParsedReadEntry> Parse(string text, List<Book> books)
     {
-        var numberDict = books.ToDictionary(x => x.Order, x => x);
+        var numberDict = books.ToDictionary(x => x.Id, x => x);
         var result = new List<ParsedReadEntry>();
         text = ReplaceBooksWithIndexes(text, numberDict);
 
@@ -21,7 +21,7 @@ public partial class ReadParser
 
         return result
             .Distinct()
-            .OrderBy(x => books.First(book => book.Title == x.StartBook).Order)
+            .OrderBy(x => books.First(book => book.Title == x.StartBook).Id)
             .ThenBy(x => x.StartChapter)
             .ToList();
     }
@@ -82,7 +82,7 @@ public partial class ReadParser
                 .ToList();
             foreach (var variant in variants)
             {
-                sb = sb.Replace(variant.ToLower(), $"book_{book.Order}_");
+                sb = sb.Replace(variant.ToLower(), $"book_{book.Id}_");
             }
         }
 

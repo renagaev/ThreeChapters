@@ -8,7 +8,7 @@ public class IntervalMerger
 {
     public ICollection<ReadInterval> Merge(ICollection<ReadInterval> intervals, ICollection<Book> books)
     {
-        var booksDict = books.ToDictionary(b => b.Order);
+        var booksDict = books.ToDictionary(b => b.Id);
         return intervals.Aggregate(new Stack<ReadInterval>(), (acc, interval) =>
         {
             if (acc.Count == 0)

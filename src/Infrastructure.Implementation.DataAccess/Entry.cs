@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 
 namespace Infrastructure.Implementation.DataAccess;
 
@@ -12,7 +13,10 @@ public static class Entry
     {
         services.AddDbContext<IDbContext, AppDbContext>((provider, builder) =>
         {
-            builder.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+            var dataSource = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DefaultConnection"))
+                .EnableDynamicJson()
+                .Build();
+            builder.UseNpgsql(dataSource)
                 .UseSnakeCaseNamingConvention();
         });
 

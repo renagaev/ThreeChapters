@@ -14,7 +14,7 @@ public class ReadParserTests
         var rawBooks = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText("books.json"), options)!;
         _books = Enumerable.Range(0, rawBooks.Count - 1).Select(x => new Book
         {
-            Order = x,
+            Id = x,
             Title = rawBooks[x].Title,
             TitleVariants = rawBooks[x].TitleVariants,
         }).ToList();

@@ -14,7 +14,7 @@ public class IntervalMergerTests
         var rawBooks = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText("books.json"), Options)!;
         Books = Enumerable.Range(0, rawBooks.Count).Select(x => new Book
         {
-            Order = x,
+            Id = x,
             Title = rawBooks[x].Title,
             TitleVariants = rawBooks[x].TitleVariants,
             ChaptersCount = rawBooks[x].ChaptersCount,

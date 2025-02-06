@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Implementation.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250204192942_Initial")]
+    [Migration("20250206110451_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -37,10 +37,6 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                     b.Property<int>("ChaptersCount")
                         .HasColumnType("integer")
                         .HasColumnName("chapters_count");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer")
-                        .HasColumnName("order");
 
                     b.Property<string>("Title")
                         .IsRequired()

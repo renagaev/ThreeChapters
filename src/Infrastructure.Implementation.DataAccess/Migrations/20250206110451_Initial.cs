@@ -18,7 +18,6 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    order = table.Column<int>(type: "integer", nullable: false),
                     title = table.Column<string>(type: "text", nullable: false),
                     chapters_count = table.Column<int>(type: "integer", nullable: false),
                     title_variants = table.Column<string[]>(type: "jsonb", nullable: false)
