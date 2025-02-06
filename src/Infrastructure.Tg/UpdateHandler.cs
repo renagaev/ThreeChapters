@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using UseCases.ProcessComment;
 
 namespace Infrastructure.Tg;
@@ -14,9 +15,10 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSetti
     {
         using var scope = scopeFactory.CreateScope();
         var sender = scope.ServiceProvider.GetRequiredService<ISender>();
-        await (update switch
+        await (update.Type switch
         {
-            { Message: { } message } => HandleMessageUpdate(sender, message, cancellationToken),
+            UpdateType.Message => HandleMessageUpdate(sender, update.Message!, cancellationToken),
+            UpdateType.EditedMessage => HandleMessageUpdate(sender, update.EditedMessage!, cancellationToken),
             _ => Task.CompletedTask
         });
     }
