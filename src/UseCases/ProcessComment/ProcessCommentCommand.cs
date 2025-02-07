@@ -66,7 +66,12 @@ public class ProcessCommentCommandHandler(
             _ => $"{bookById[x.StartBook]} {x.StartChapter} - {bookById[x.EndBook]} {x.EndChapter}"
         }));
         var source = message.ReplyToMessage!.Text!;
-        var newMessage = Regex.Replace(source, $"[✅❔] {participant.Name}(:.*)*", $"✅ {participant.Name}: {renderedIntervals}");
+        var newMessage = Regex.Replace(source, $@"[✅❔]\s*{participant.Name}(:.*)*", $"✅ {participant.Name}: {renderedIntervals}");
+        if (source == newMessage)
+        {
+            logger.LogError("Failed to find  user in message {User}", participant.Name);
+            return;
+        }
 
         var sourceMessage = message.ReplyToMessage.ForwardOrigin as MessageOriginChannel;
         await botClient.EditMessageText(sourceMessage!.Chat.Id, sourceMessage.MessageId, newMessage, cancellationToken: cancellationToken);
