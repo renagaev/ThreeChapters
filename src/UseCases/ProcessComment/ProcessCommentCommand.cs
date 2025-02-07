@@ -52,8 +52,6 @@ public class ProcessCommentCommandHandler(
 
         var mergedIntervals = merger.Merge(readIntervals, books);
         await UpdateMessage(message, user, books, mergedIntervals, cancellationToken);
-        
-        await botClient.SetMessageReaction(message.Chat.Id, message.MessageId, [new ReactionTypeEmoji { Emoji = "🔥" }], cancellationToken: cancellationToken);
     }
 
     private async Task UpdateMessage(Message message, Participant participant, ICollection<Book> books, ICollection<ReadInterval> readIntervals, CancellationToken cancellationToken)
