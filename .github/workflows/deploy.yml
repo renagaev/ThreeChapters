@@ -2,7 +2,7 @@ name: Build and deploy to remote server
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     
 env:
   image_tag: ${{ secrets.DOCKERHUB_USERNAME }}/threechapters:latest
