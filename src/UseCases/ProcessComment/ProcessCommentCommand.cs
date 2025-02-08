@@ -22,6 +22,7 @@ public class ProcessCommentCommandHandler(
 {
     public async Task Handle(ProcessCommentCommand request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Received comment from user {userId} {username} with text {text}", request.Message.From.Id, request.Message.From.Username, request.Message.Text);
         var message = request.Message;
         if (message.Text is not { Length: > 0 } text)
         {

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
@@ -9,7 +10,7 @@ using UseCases.ProcessComment;
 
 namespace Infrastructure.Tg;
 
-internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSettings> options) : IUpdateHandler
+internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSettings> options, ILogger<UpdateHandler> logger) : IUpdateHandler
 {
     public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,CancellationToken cancellationToken)
     {
@@ -34,6 +35,8 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSetti
     public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source,
         CancellationToken cancellationToken)
     {
+        
+        logger.LogError(exception, "Error during update processing");
         return Task.CompletedTask;
     }
 }
