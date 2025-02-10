@@ -4,12 +4,12 @@ using UseCases.Services;
 
 namespace UseCases.UnitTests;
 
-public class ReadParserTests
+public class IntervalParserTests
 {
     private static JsonSerializerOptions options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     private static List<Book> _books;
 
-    static ReadParserTests()
+    static IntervalParserTests()
     {
         var rawBooks = JsonSerializer.Deserialize<List<Book>>(File.ReadAllText("books.json"), options)!;
         _books = Enumerable.Range(0, rawBooks.Count - 1).Select(x => new Book
@@ -39,7 +39,7 @@ public class ReadParserTests
     public void Should_Parse_Messages(TestCase testCase)
     {
         // Arrange
-        var parser = new ReadParser();
+        var parser = new IntervalParser();
 
         // Act
         var result = parser.Parse(testCase.Source, _books);
@@ -60,7 +60,7 @@ public class ReadParserTests
     public void Should_Parse_MultibookEntry(string text, string startBook, int start, string endBook, int end)
     {
         // Arrange
-        var parser = new ReadParser();
+        var parser = new IntervalParser();
 
         // Act
         var result = parser.Parse(text, _books);
@@ -74,7 +74,7 @@ public class ReadParserTests
     public void Should_Parse_SingleChapterEntry()
     {
         // Arrange
-        var parser = new ReadParser();
+        var parser = new IntervalParser();
 
         // Act
         var result = parser.Parse("Деяния 1", _books);
@@ -91,7 +91,7 @@ public class ReadParserTests
     public void Should_Not_Parse_Verse_Entry(string text)
     {
         // Arrange
-        var parser = new ReadParser();
+        var parser = new IntervalParser();
 
         // Act
         var result = parser.Parse(text, _books);
@@ -114,7 +114,7 @@ public class ReadParserTests
     public void Should_Parse_SingleBookEntry(string text, string book, int start, int end)
     {
         // Arrange
-        var parser = new ReadParser();
+        var parser = new IntervalParser();
 
         // Act
         var result = parser.Parse(text, _books);

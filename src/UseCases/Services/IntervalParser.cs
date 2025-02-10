@@ -6,9 +6,14 @@ namespace UseCases.Services;
 
 public record ParsedReadEntry(string StartBook, int StartChapter, string EndBook, int EndChapter);
 
-public partial class ReadParser
+public interface IIntervalParser
 {
-    public List<ParsedReadEntry> Parse(string text, List<Book> books)
+    public ICollection<ParsedReadEntry> Parse(string text, ICollection<Book> books);
+}
+
+public partial class IntervalParser : IIntervalParser
+{
+    public ICollection<ParsedReadEntry> Parse(string text, ICollection<Book> books)
     {
         var numberDict = books.ToDictionary(x => x.Id, x => x);
         var result = new List<ParsedReadEntry>();
@@ -28,6 +33,7 @@ public partial class ReadParser
 
     [GeneratedRegex(@"book_(?<book>\d+)_[\s\:\-]+(?<chapters>\d+(?:\s*,\s*\d+)+)")]
     private static partial Regex CommaSeparatedChaptersRegex();
+
     private static IEnumerable<ParsedReadEntry> FindCommaSeparatedEntries(string text, Dictionary<int, Book> books) =>
         CommaSeparatedChaptersRegex().Matches(text).SelectMany(x =>
         {
@@ -38,6 +44,7 @@ public partial class ReadParser
 
     [GeneratedRegex(@"book_(?<startbook>\d+)_\s+(?<start>\d+)\s*-\s*book_(?<endbook>\d+)_\s*(?<end>\d+)")]
     private static partial Regex MultibooksRegex();
+
     private static IEnumerable<ParsedReadEntry> FindMultiBookEntries(string text, Dictionary<int, Book> books) =>
         MultibooksRegex().Matches(text).Select(x =>
         {
@@ -51,6 +58,7 @@ public partial class ReadParser
 
     [GeneratedRegex(@"(?<!-\s*)book_(?<book>\d+)_\s*(?<chapter>\d+)(?!\s*([:-]|[0-9]))")]
     private static partial Regex SingleChapterRegex();
+
     private static IEnumerable<ParsedReadEntry> FindSingleChapterEntries(string text, Dictionary<int, Book> books) =>
         SingleChapterRegex().Matches(text).Select(x =>
         {
@@ -59,9 +67,10 @@ public partial class ReadParser
             return new ParsedReadEntry(book.Title, chapter, book.Title, chapter);
         });
 
-    
+
     [GeneratedRegex(@"book_(?<book>\d+)_[\s\:]+(?<start>\d+)\s*-\s*(?<end>\d+)")]
     private static partial Regex SingleBookRegex();
+
     private static IEnumerable<ParsedReadEntry> FindSingleBookEntries(string text, Dictionary<int, Book> books) =>
         SingleBookRegex().Matches(text).Select(x =>
         {

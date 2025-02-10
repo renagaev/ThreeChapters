@@ -15,7 +15,7 @@ public record ProcessCommentCommand(Message Message) : IRequest;
 public class ProcessCommentCommandHandler(
     ITelegramBotClient botClient,
     IDbContext dbContext,
-    ReadParser readParser,
+    IIntervalParser intervalParser,
     IntervalMerger merger,
     ILogger<ProcessCommentCommandHandler> logger)
     : IRequestHandler<ProcessCommentCommand>
@@ -39,7 +39,7 @@ public class ProcessCommentCommandHandler(
         }
 
         var books = dbContext.Books.ToList();
-        var intervals = readParser.Parse(text, books);
+        var intervals = intervalParser.Parse(text, books);
         if (intervals.Count == 0)
         {
             logger.LogInformation("Skipping message with no read entries, message: {MessageText}", text);
@@ -65,7 +65,7 @@ public class ProcessCommentCommandHandler(
             _ => $"{bookById[x.StartBook]} {x.StartChapter} - {bookById[x.EndBook]} {x.EndChapter}"
         }));
         var source = message.ReplyToMessage!.Text!;
-        var newMessage = Regex.Replace(source, $@"[✅❔]\s*{participant.Name}(:.*)*", $"✅ {participant.Name}: {renderedIntervals}");
+        var newMessage = Regex.Replace(source, $@"[{Constants.ReadMark}{Constants.UnreadMark}]\s*{participant.Name}(:.*)*", $"{Constants.ReadMark} {participant.Name}: {renderedIntervals}");
         if (source == newMessage)
         {
             logger.LogError("Failed to find  user in message {User}", participant.Name);

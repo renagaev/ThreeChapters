@@ -13,7 +13,7 @@ public static class Entry
             cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
         });
         services.AddSingleton<IntervalMerger>();
-        services.AddSingleton<ReadParser>();
+        services.AddSingleton<IIntervalParser, IntervalParser>();
         return services;
     }
 }
