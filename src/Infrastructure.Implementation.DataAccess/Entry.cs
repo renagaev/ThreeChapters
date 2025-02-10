@@ -11,11 +11,11 @@ public static class Entry
     public static IServiceCollection AddDataAccess(this IServiceCollection services,
         IConfiguration configuration)
     {
+        var dataSource = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DefaultConnection"))
+            .EnableDynamicJson()
+            .Build();
         services.AddDbContext<IDbContext, AppDbContext>((provider, builder) =>
         {
-            var dataSource = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("DefaultConnection"))
-                .EnableDynamicJson()
-                .Build();
             builder.UseNpgsql(dataSource)
                 .UseSnakeCaseNamingConvention();
         });
