@@ -8,4 +8,6 @@ public interface IDbContext
     public DbSet<Book> Books { get; }
     public DbSet<Participant> Participants { get; }
     public DbSet<ReadEntry> ReadEntries { get; }
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

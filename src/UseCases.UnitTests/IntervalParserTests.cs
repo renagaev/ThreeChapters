@@ -8,6 +8,7 @@ public class IntervalParserTests
 {
     private static JsonSerializerOptions options = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
     private static List<Book> _books;
+    private static Dictionary<string, int> _bookDict;
 
     static IntervalParserTests()
     {
@@ -18,34 +19,38 @@ public class IntervalParserTests
             Title = rawBooks[x].Title,
             TitleVariants = rawBooks[x].TitleVariants,
         }).ToList();
+        _bookDict = _books.ToDictionary(x => x.Title, x => x.Id);
     }
 
-    public static TheoryData<TestCase> TestCases
+    public static TheoryData<string, ICollection<ReadInterval>> TestCases
     {
         get
         {
-            var data = new TheoryData<TestCase>();
+            var data = new TheoryData<string, ICollection<ReadInterval>>();
             var cases = JsonSerializer.Deserialize<List<TestCase>>(File.ReadAllText("parserCases.json"), options)!;
             foreach (var testCase in cases)
             {
-                data.Add(testCase);
+                var expected = testCase.Entries
+                    .Select(x => new ReadInterval(_bookDict[x.StartBook], x.Start, _bookDict[x.EndBook], x.End))
+                    .ToList();
+                data.Add(testCase.Source, expected);
             }
             return data;
         }
     }
-
+    
     [Theory]
     [MemberData(nameof(TestCases))]
-    public void Should_Parse_Messages(TestCase testCase)
+    public void Should_Parse_Messages(string source, ICollection<ReadInterval> expected)
     {
         // Arrange
         var parser = new IntervalParser();
 
         // Act
-        var result = parser.Parse(testCase.Source, _books);
+        var result = parser.Parse(source, _books);
 
         // Assert
-        Assert.Equal(testCase.Entries.Select(x => new ParsedReadEntry(x.StartBook, x.Start, x.EndBook, x.End)), result);
+        Assert.Equal(expected, result);
     }
 
     public static TheoryData<string, string, int, string, int> MultibookTestCases => new()
@@ -67,7 +72,7 @@ public class IntervalParserTests
 
         // Assert
         var entry = result.Single();
-        Assert.Equal(new ParsedReadEntry(startBook, start, endBook, end), entry);
+        Assert.Equal(new ReadInterval(_bookDict[startBook], start, _bookDict[endBook], end), entry);
     }
 
     [Fact]
@@ -81,7 +86,7 @@ public class IntervalParserTests
 
         // Assert
         var entry = result.Single();
-        Assert.Equal(new ParsedReadEntry("Деяния", 1, "Деяния", 1), entry);
+        Assert.Equal(new ReadInterval(_bookDict["Деяния"], 1, _bookDict["Деяния"], 1), entry);
     }
 
     [Theory]
@@ -121,7 +126,7 @@ public class IntervalParserTests
 
         // Assert
         var entry = result.Single();
-        Assert.Equal(new ParsedReadEntry(book, start, book, end), entry);
+        Assert.Equal(new ReadInterval(_bookDict[book], start, _bookDict[book], end), entry);
     }
 
 

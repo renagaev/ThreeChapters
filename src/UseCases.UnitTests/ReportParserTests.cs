@@ -19,8 +19,8 @@ public class ReportParserTests
                             ❔ user3
                             ❔ user4
                             """;
-        var firstUserEntries = new[] { new ParsedReadEntry("1-Царств", 23, "1-Царств", 26) };
-        var secondUserEntries = new[] { new ParsedReadEntry("Деяния", 1, "Деяния", 4) };
+        var firstUserEntries = new[] { new ReadInterval(1, 23, 1, 26) };
+        var secondUserEntries = new[] { new ReadInterval(2, 1, 2, 4) };
         var intervalParserMock = new Mock<IIntervalParser>();
         intervalParserMock.Setup(x => x.Parse("1-Царств 23-26", It.IsAny<ICollection<Book>>()))
             .Returns(firstUserEntries);
