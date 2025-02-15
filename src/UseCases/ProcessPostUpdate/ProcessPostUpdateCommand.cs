@@ -64,31 +64,44 @@ public class ProcessPostUpdateCommandHandler(
                 .SelectMany(x => splitter.Split(x, books))
                 .ToList();
 
-            if (participant.ReadEntries.Count == newIntervals.Count)
+
+            var oldLookup = participant.ReadEntries.ToLookup(x => (x.BookId, x.StartChapter, x.EndChapter));
+            var newLookup = newIntervals.ToLookup(x => (x.Book, x.StartChapter, x.EndChapter));
+
+            var keys = oldLookup
+                .Select(x => x.Key)
+                .Union(newLookup.Select(x => x.Key))
+                .ToHashSet();
+
+            var joined = from key in keys
+                from old in oldLookup[key].DefaultIfEmpty()
+                from newEntry in newLookup[key].DefaultIfEmpty()
+                select new { old, newEntry };
+            
+            foreach (var pair in joined)
             {
-                if (newIntervals.All(x => participant.ReadEntries.Any(existing =>
-                        (existing.BookId, existing.StartChapter, existing.EndChapter) ==
-                        (x.Book, x.StartChapter, x.EndChapter))))
+                if (pair.old != null && pair.newEntry != null)
                 {
                     continue;
-                }
-            }
-
-            // TODO use full outer join
-            participant.ReadEntries.Clear();
-            foreach (var newInterval in newIntervals)
-            {
-                participant.ReadEntries.Add(new ReadEntry
+                } else if (pair.old != null && pair.newEntry == null)
                 {
-                    Date = report.Date,
-                    BookId = newInterval.Book,
-                    StartChapter = newInterval.StartChapter,
-                    EndChapter = newInterval.EndChapter
-                });
+                    participant.ReadEntries.Remove(pair.old);
+                }
+                else if (pair.old == null && pair.newEntry != null)
+                {
+                    participant.ReadEntries.Add(new ReadEntry
+                    {
+                        Date = report.Date,
+                        BookId = pair.newEntry.Book,
+                        StartChapter = pair.newEntry.StartChapter,
+                        EndChapter = pair.newEntry.EndChapter
+                    });
+                }
             }
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        return;
         var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
         await notificationPublisher.Publish(notification, cancellationToken);
     }
