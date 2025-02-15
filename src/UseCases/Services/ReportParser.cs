@@ -36,7 +36,7 @@ public partial class ReportParser(IIntervalParser intervalParser, ILogger<Report
             var intervals = intervalParser.Parse(match.Groups[2].Value, books);
             if (intervals.Count == 0)
             {
-                throw new Exception($"failed to parse intervals for user {name}");
+                throw new Exception($"failed to parse intervals for user {name} from text {match.Groups[2].Value}");
             }
             return new ReportItem(name, intervals);
         }).ToList();

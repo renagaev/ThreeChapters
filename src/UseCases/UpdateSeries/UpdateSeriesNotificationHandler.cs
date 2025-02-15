@@ -53,21 +53,23 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         }
 
         var maxLen = lengths.Max(x => x.participant.Name.Length) + 1;
-        var table = new StringBuilder();
-        table.Append($"| {"Имя".PadRight(maxLen)}| Дней|\n");
-        table.Append($"|-{"-".PadRight(maxLen, '-')}|-----|\n");
+        var rows = new List<string>
+        {
+            $"{"Имя".PadRight(maxLen)}| Дней",
+            $"{"-".PadRight(maxLen, '-')}|----"
+        };
         foreach (var (participant, length) in lengths.OrderBy(x => x.participant.Id))
         {
-            table.Append($"| {participant.Name.PadRight(maxLen)}| {length.ToString().PadRight(4)}|\n");
+            rows.Add($"{participant.Name.PadRight(maxLen)}| {length.ToString(),-4}");
         }
 
-        var messageText = $"Дней подряд\n\n<pre>{table}</pre>";
+        var table = string.Join("\n", rows.Select(x => $"`{x}`"));
+        var messageText = "Серии - количество дней подряд без пропуска\n\n" + table;
 
-        var existingMessage =
-            await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
+        var existingMessage = await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
         if (existingMessage == null)
         {
-            var message = await botClient.SendMessage(notification.ChatId, messageText, parseMode: ParseMode.Html,
+            var message = await botClient.SendMessage(notification.ChatId, messageText, parseMode: ParseMode.Markdown,
                 replyParameters: new ReplyParameters
                 {
                     ChatId = notification.ChatId,
@@ -84,7 +86,7 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         else
         {
             await botClient.EditMessageText(new ChatId(existingMessage.ChatId), existingMessage.MessageId, messageText,
-                ParseMode.Html, cancellationToken: cancellationToken);
+                ParseMode.Markdown, cancellationToken: cancellationToken);
         }
     }
 }
