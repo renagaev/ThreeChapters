@@ -101,7 +101,6 @@ public class ProcessPostUpdateCommandHandler(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        return;
         var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
         await notificationPublisher.Publish(notification, cancellationToken);
     }
