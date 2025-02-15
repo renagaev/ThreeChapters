@@ -74,8 +74,6 @@ public class ProcessPostUpdateCommandHandler(
                 }
             }
 
-            intervalsUpdated = true;
-
             // TODO use full outer join
             participant.ReadEntries.Clear();
             foreach (var newInterval in newIntervals)
@@ -91,10 +89,7 @@ public class ProcessPostUpdateCommandHandler(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        if (intervalsUpdated)
-        {
-            var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
-            await notificationPublisher.Publish(notification, cancellationToken);
-        }
+        var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
+        await notificationPublisher.Publish(notification, cancellationToken);
     }
 }
