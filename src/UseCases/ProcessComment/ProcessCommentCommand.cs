@@ -30,7 +30,7 @@ public class ProcessCommentCommandHandler(
             return;
         }
 
-        var user = await dbContext.Participants.FirstOrDefaultAsync(x => x.Id == message.From.Id,
+        var user = await dbContext.Participants.FirstOrDefaultAsync(x => x.TelegramId == message.From.Id,
             cancellationToken);
         if (user is null)
         {
@@ -46,12 +46,7 @@ public class ProcessCommentCommandHandler(
             return;
         }
 
-        var bookByName = books.ToDictionary(x => x.Title, x => x.Id);
-        var readIntervals = intervals
-            .Select(x => new ReadInterval(bookByName[x.StartBook], x.StartChapter, bookByName[x.EndBook], x.EndChapter))
-            .ToList();
-
-        var mergedIntervals = merger.Merge(readIntervals, books);
+        var mergedIntervals = merger.Merge(intervals, books);
         await UpdateMessage(message, user, books, mergedIntervals, cancellationToken);
     }
 

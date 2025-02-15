@@ -3,6 +3,7 @@ using System;
 using Infrastructure.Implementation.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Infrastructure.Implementation.DataAccess.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250215091947_Move_Participant_Id")]
+    partial class Move_Participant_Id
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,37 +121,6 @@ namespace Infrastructure.Implementation.DataAccess.Migrations
                         .HasDatabaseName("ix_read_entries_participant_id");
 
                     b.ToTable("read_entries", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.SeriesMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<long>("ChatId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("chat_id");
-
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date")
-                        .HasColumnName("date");
-
-                    b.Property<int>("MessageId")
-                        .HasColumnType("integer")
-                        .HasColumnName("message_id");
-
-                    b.HasKey("Id")
-                        .HasName("pk_series_messages");
-
-                    b.HasIndex("Date")
-                        .IsUnique()
-                        .HasDatabaseName("ix_series_messages_date");
-
-                    b.ToTable("series_messages", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.ReadEntry", b =>

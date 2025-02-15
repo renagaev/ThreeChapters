@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace UseCases.Services;
 
-public record ReportItem(string User, ICollection<ParsedReadEntry> Intervals);
+public record ReportItem(string User, ICollection<ReadInterval> Intervals);
 
 public record Report(DateOnly Date, ICollection<ReportItem> Items);
 
@@ -34,6 +34,10 @@ public partial class ReportParser(IIntervalParser intervalParser, ILogger<Report
         {
             var name = match.Groups[1].Value;
             var intervals = intervalParser.Parse(match.Groups[2].Value, books);
+            if (intervals.Count == 0)
+            {
+                throw new Exception($"failed to parse intervals for user {name}");
+            }
             return new ReportItem(name, intervals);
         }).ToList();
 
