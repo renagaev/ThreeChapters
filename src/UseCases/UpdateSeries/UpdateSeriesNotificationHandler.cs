@@ -55,7 +55,7 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         var maxLen = lengths.Max(x => x.participant.Name.Length) + 1;
         var table = new StringBuilder();
         table.Append($"| {"Имя".PadRight(maxLen)}| Дней|\n");
-        table.Append($"|{"-".PadRight(maxLen, '-')}|-----|\n");
+        table.Append($"|-{"-".PadRight(maxLen, '-')}|-----|\n");
         foreach (var (participant, length) in lengths.OrderBy(x => x.participant.Id))
         {
             table.Append($"| {participant.Name.PadRight(maxLen)}| {length.ToString().PadRight(4)}|\n");
