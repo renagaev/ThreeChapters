@@ -30,7 +30,7 @@ public class ProcessCommentCommandHandler(
             return;
         }
 
-        var user = await dbContext.Participants.FirstOrDefaultAsync(x => x.Id == message.From.Id,
+        var user = await dbContext.Participants.FirstOrDefaultAsync(x => x.TelegramId == message.From.Id,
             cancellationToken);
         if (user is null)
         {
