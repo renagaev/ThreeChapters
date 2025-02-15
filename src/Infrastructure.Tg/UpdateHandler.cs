@@ -7,6 +7,7 @@ using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using UseCases.ProcessComment;
+using UseCases.ProcessPostUpdate;
 
 namespace Infrastructure.Tg;
 
@@ -30,12 +31,16 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSetti
         {
             await sender.Send(new ProcessCommentCommand(message), cancellationToken);
         }
+
+        if (message.ForwardFromChat is { Type: ChatType.Channel } sourceChannel && sourceChannel.Id == options.Value.ChannelId)
+        {
+            await sender.Send(new ProcessPostUpdateCommand(message), cancellationToken);
+        }
     }
 
     public Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source,
         CancellationToken cancellationToken)
     {
-        
         logger.LogError(exception, "Error during update processing");
         return Task.CompletedTask;
     }

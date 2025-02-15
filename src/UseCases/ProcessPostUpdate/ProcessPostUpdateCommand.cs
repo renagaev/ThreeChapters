@@ -3,14 +3,17 @@ using Infrastructure.Interfaces.DataAccess;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Telegram.Bot.Types;
+using UseCases.Notifications;
 using UseCases.Services;
 
 namespace UseCases.ProcessPostUpdate;
 
-public record ProcessPostUpdateCommand(string Text) : IRequest;
+public record ProcessPostUpdateCommand(Message Message) : IRequest;
 
 public class ProcessPostUpdateCommandHandler(
     IDbContext dbContext,
+    IMediator notificationPublisher,
     ILogger<ProcessPostUpdateCommandHandler> logger,
     IntervalSplitter splitter,
     IntervalMerger merger,
@@ -23,10 +26,10 @@ public class ProcessPostUpdateCommandHandler(
         Report report = null!;
         try
         {
-            var parsedReport = reportParser.Parse(request.Text, books);
+            var parsedReport = reportParser.Parse(request.Message.Text!, books);
             if (parsedReport == null)
             {
-                logger.LogInformation("failed to parse report from post: {PostMessage}", request.Text);
+                logger.LogInformation("failed to parse report from post: {PostMessage}", request.Message.Text);
                 return;
             }
 
@@ -41,6 +44,7 @@ public class ProcessPostUpdateCommandHandler(
             .Include(x => x.ReadEntries.Where(x => x.Date == report.Date))
             .ToList();
 
+        var intervalsUpdated = false;
         foreach (var item in report.Items)
         {
             var participant = existingItems.FirstOrDefault(x =>
@@ -70,6 +74,8 @@ public class ProcessPostUpdateCommandHandler(
                 }
             }
 
+            intervalsUpdated = true;
+
             // TODO use full outer join
             participant.ReadEntries.Clear();
             foreach (var newInterval in newIntervals)
@@ -85,5 +91,10 @@ public class ProcessPostUpdateCommandHandler(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
+        if (intervalsUpdated)
+        {
+            var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
+            await notificationPublisher.Publish(notification, cancellationToken);
+        }
     }
 }
