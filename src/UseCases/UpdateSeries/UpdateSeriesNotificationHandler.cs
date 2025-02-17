@@ -62,7 +62,7 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         foreach (var (participant, length, maxLength) in lengths.OrderBy(x => x.participant.Id))
         {
             var isMax = (length == maxLength && length != 0);
-            var lenStr = length.ToString().PadRight(4);
+            var lenStr = length.ToString().PadRight(3);
             if (isMax) lenStr += "🔥";
             rows.Add($"{participant.Name.PadRight(maxLen)}| {lenStr}");
         }
