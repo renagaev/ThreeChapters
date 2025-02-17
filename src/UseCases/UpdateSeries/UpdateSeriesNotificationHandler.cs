@@ -61,8 +61,8 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         };
         foreach (var (participant, length, maxLength) in lengths.OrderBy(x => x.participant.Id))
         {
-            var lenStr = (length == maxLength && length != 0) ? $"{length}🔥" : length.ToString();
-            rows.Add($"{participant.Name.PadRight(maxLen)}| {lenStr,4}");
+            var lenStr = (length == maxLength && length != 0) ? $"🔥{length.ToString(),-3}" : length.ToString().PadRight(4);
+            rows.Add($"{participant.Name.PadRight(maxLen)}| {lenStr}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
