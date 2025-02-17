@@ -24,7 +24,7 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
                 .Distinct()
         }).ToListAsync(cancellationToken);
 
-        var lengths = new List<(Participant participant, int length)>();
+        var lengths = new List<(Participant participant, int curr, int max)>();
         foreach (var series in rawSeries)
         {
             var folded = series.dates.Order().Aggregate(new Stack<(DateOnly Start, DateOnly End)>(), (acc, curr) =>
@@ -48,8 +48,9 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
             });
 
             var curr = folded.FirstOrDefault(x => x.Start <= date && (x.End >= date || x.End == date.AddDays(-1)));
-            var length = curr == default ? 0 : curr.End.DayNumber - curr.Start.DayNumber + 1;
-            lengths.Add((series.participant, length));
+            var currLength = curr == default ? 0 : curr.End.DayNumber - curr.Start.DayNumber + 1;
+            var max = folded.Count != 0 ? folded.Max(x => x.End.DayNumber - x.Start.DayNumber + 1) : 0;
+            lengths.Add((series.participant, currLength, max));
         }
 
         var maxLen = lengths.Max(x => x.participant.Name.Length) + 1;
@@ -58,13 +59,14 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
             $"{"Имя".PadRight(maxLen)}| Дней",
             $"{"-".PadRight(maxLen, '-')}|----"
         };
-        foreach (var (participant, length) in lengths.OrderBy(x => x.participant.Id))
+        foreach (var (participant, length, maxLength) in lengths.OrderBy(x => x.participant.Id))
         {
-            rows.Add($"{participant.Name.PadRight(maxLen)}| {length.ToString(),-4}");
+            var lenStr = (length == maxLength && length != 0) ? $"{length}🔥" : length.ToString();
+            rows.Add($"{participant.Name.PadRight(maxLen)}| {lenStr,4}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
-        var messageText = "Серии - количество дней подряд без пропуска\n\n" + table;
+        var messageText = "Серии - количество дней подряд без пропуска\n🔥- лучшая серия участника\n\n" + table;
 
         var existingMessage = await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
         if (existingMessage == null)
