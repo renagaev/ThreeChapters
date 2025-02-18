@@ -1,9 +1,9 @@
-using System.Text;
 using Domain.Entities;
 using Infrastructure.Interfaces.DataAccess;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using UseCases.Notifications;
@@ -89,8 +89,17 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         }
         else
         {
-            await botClient.EditMessageText(new ChatId(existingMessage.ChatId), existingMessage.MessageId, messageText,
-                ParseMode.Markdown, cancellationToken: cancellationToken);
+            try
+            {
+                await botClient.EditMessageText(new ChatId(existingMessage.ChatId), existingMessage.MessageId, messageText,
+                    ParseMode.Markdown, cancellationToken: cancellationToken);
+            }
+            catch (ApiRequestException e) when(e.Message.Contains("not modified"))
+            {
+                // TODO handle cases like this
+                // ignore
+            }
+            
         }
     }
 }
