@@ -125,7 +125,7 @@ public class ProcessPostUpdateCommandHandler(
         var totalUsers = report.Items.Count;
         var totalChapters = intervals.Sum(x => x.EndChapter - x.StartChapter + 1);
 
-        var match = Regex.Match(message.Text, @"\d+/\d, прочитан\w \d+ глав\w?");
+        var match = Regex.Match(message.Text, @"\d+/\d+, прочитан\w \d+ глав\w?");
         var end = (totalChapters % 10) switch
         {
             1 => "а",
