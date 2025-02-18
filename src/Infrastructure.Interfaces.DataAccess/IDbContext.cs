@@ -9,6 +9,7 @@ public interface IDbContext
     public DbSet<Participant> Participants { get; }
     public DbSet<ReadEntry> ReadEntries { get; }
     public DbSet<SeriesMessage> SeriesMessages { get; }
+    public DbSet<DailyPost> DailyPosts { get; }
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Tg;
+﻿namespace UseCases.Settings;
 
 public class TgSettings
 {
