@@ -24,7 +24,8 @@ public class ProcessCommentCommandHandler(
     {
         logger.LogInformation("Received comment from user {userId} {username} with text {text}", request.Message.From.Id, request.Message.From.Username, request.Message.Text);
         var message = request.Message;
-        if (message.Text is not { Length: > 0 } text)
+        var text = message.Text ?? message.Caption;
+        if (text is not { Length: > 0 })
         {
             logger.LogInformation("Skipping empty message");
             return;
