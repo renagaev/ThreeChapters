@@ -15,6 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Infrastructure.Implementation.BackgroundJobs\Infrastructure.Implementation.BackgroundJobs.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.DataAccess\Infrastructure.Implementation.DataAccess.csproj" />
       <ProjectReference Include="..\Infrastructure.Tg\Infrastructure.Tg.csproj" />
       <ProjectReference Include="..\UseCases\UseCases.csproj" />

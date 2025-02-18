@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using UseCases.Settings;
 
 namespace Infrastructure.Tg;
 

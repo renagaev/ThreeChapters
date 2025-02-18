@@ -21,5 +21,6 @@ WORKDIR app
 COPY --from=backend src/publish .
 
 EXPOSE 80
+ENV TZ=Europe/Moscow
 ENV ASPNETCORE_URLS http://0.0.0.0:80
 ENTRYPOINT ["dotnet", "ThreeChapters.API.dll"]

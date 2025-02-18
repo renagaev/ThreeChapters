@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using UseCases.ProcessComment;
 using UseCases.ProcessPostUpdate;
+using UseCases.Settings;
 
 namespace Infrastructure.Tg;
 
