@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 as backend
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS backend
 
 WORKDIR src
 
@@ -16,9 +16,20 @@ RUN dotnet restore ThreeChapters.API/ThreeChapters.API.csproj
 COPY src ./
 RUN dotnet publish ThreeChapters.API/ThreeChapters.API.csproj --output ./publish
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 as final 
+FROM node:lts-alpine AS frontend 
+
+WORKDIR app
+
+COPY frontend/package.json . 
+RUN npm install
+
+COPY frontend . 
+RUN npm run build
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final 
 WORKDIR app 
 COPY --from=backend src/publish .
+COPY --from=frontend app/dist wwwroot
 
 EXPOSE 80
 ENV TZ=Europe/Moscow
