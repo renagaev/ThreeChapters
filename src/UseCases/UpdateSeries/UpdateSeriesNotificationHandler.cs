@@ -11,16 +11,21 @@ using UseCases.Notifications;
 namespace UseCases.UpdateSeries;
 
 public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotClient botClient)
-    : INotificationHandler<ReadIntervalsUpdatedNotification>
+    : INotificationHandler<ReadIntervalsUpdatedNotification>, INotificationHandler<DailyPostCreatedNotification>
 {
-    public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken)
+    public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
+        await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
+
+    public async Task Handle(DailyPostCreatedNotification notification, CancellationToken cancellationToken) =>
+        await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
+
+    private async Task UpdateSeries(DateOnly date, ChatId chatId, int messageId, CancellationToken cancellationToken)
     {
-        var date = notification.Date;
         var rawSeries = await dbContext.Participants.Select(x => new
         {
             participant = x,
             dates = x.ReadEntries.Select(x => x.Date)
-                .Where(x => x <= notification.Date)
+                .Where(x => x <= date)
                 .Distinct()
         }).ToListAsync(cancellationToken);
 
@@ -70,14 +75,15 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
         var messageText = "Серии - количество дней подряд без пропуска\n🔥- лучшая серия участника\n\n" + table;
 
-        var existingMessage = await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
+        var existingMessage =
+            await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
         if (existingMessage == null)
         {
-            var message = await botClient.SendMessage(notification.ChatId, messageText, parseMode: ParseMode.Markdown,
+            var message = await botClient.SendMessage(chatId, messageText, parseMode: ParseMode.Markdown,
                 replyParameters: new ReplyParameters
                 {
-                    ChatId = notification.ChatId,
-                    MessageId = notification.MessageId
+                    ChatId = chatId,
+                    MessageId = messageId
                 }, cancellationToken: cancellationToken);
             dbContext.SeriesMessages.Add(new SeriesMessage
             {
@@ -91,15 +97,15 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
         {
             try
             {
-                await botClient.EditMessageText(new ChatId(existingMessage.ChatId), existingMessage.MessageId, messageText,
+                await botClient.EditMessageText(new ChatId(existingMessage.ChatId), existingMessage.MessageId,
+                    messageText,
                     ParseMode.Markdown, cancellationToken: cancellationToken);
             }
-            catch (ApiRequestException e) when(e.Message.Contains("not modified"))
+            catch (ApiRequestException e) when (e.Message.Contains("not modified"))
             {
                 // TODO handle cases like this
                 // ignore
             }
-            
         }
     }
 }
