@@ -124,23 +124,19 @@ public class ProcessPostUpdateCommandHandler(
         var readUsers = report.Items.Count(x => x.Intervals.Count != 0);
         var totalUsers = report.Items.Count;
         var totalChapters = intervals.Sum(x => x.EndChapter - x.StartChapter + 1);
+        
+        var lastDigit = totalChapters % 10;
+        var lastTwoDigits = totalChapters % 100;
+        var (chapters, read) = (lastTwoDigits, lastDigit) switch
+        {
+            (>= 11 and <= 14, _) => ("глав", "прочитано"),
+            (_, 1) => ("глава", "прочитана"),
+            (_, 2) or (_, 3) or (_, 4) => ("главы", "прочитано"),
+            _ => ("глав", "прочитано")
+        };
 
         var match = Regex.Match(message.Text, @"\d+/\d+, прочитан\w \d+ глав\w?");
-        var end = (totalChapters % 10) switch
-        {
-            1 => "а",
-            2 => "ы",
-            3 => "ы",
-            4 => "ы",
-            _ => "",
-        };
-        var read = (totalChapters % 10) switch
-        {
-            1 => "прочитана",
-            _ => "прочитано"
-        };
-        var infoText = $"{readUsers}/{totalUsers}, {read} {totalChapters} глав{end}";
-        
+        var infoText = $"{readUsers}/{totalUsers}, {read} {totalChapters} {chapters}";
         var newText = match.Success ? message.Text.Replace(match.Value, infoText) : $"{message.Text}\n\n{infoText}";
         if (newText == message.Text)
         {
