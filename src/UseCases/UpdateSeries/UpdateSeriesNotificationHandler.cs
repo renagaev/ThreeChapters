@@ -11,14 +11,10 @@ using UseCases.Notifications;
 namespace UseCases.UpdateSeries;
 
 public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotClient botClient)
-    : INotificationHandler<ReadIntervalsUpdatedNotification>, INotificationHandler<DailyPostCreatedNotification>
+    : INotificationHandler<ReadIntervalsUpdatedNotification>
 {
     public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
         await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
-
-    public async Task Handle(DailyPostCreatedNotification notification, CancellationToken cancellationToken) =>
-        await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
-
     private async Task UpdateSeries(DateOnly date, ChatId chatId, int messageId, CancellationToken cancellationToken)
     {
         var rawSeries = await dbContext.Participants.Select(x => new

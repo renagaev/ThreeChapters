@@ -111,7 +111,7 @@ public class ProcessPostUpdateCommandHandler(
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
-        if (intervalsUpdated)
+        if (intervalsUpdated || report.Items.All(x=> x.Intervals.Count == 0)) 
         {
             await UpdateReadCount(request.Message, report, allNewIntervals, cancellationToken);
             var notification = new ReadIntervalsUpdatedNotification(report.Date, request.Message.Chat.Id, request.Message.Id);
