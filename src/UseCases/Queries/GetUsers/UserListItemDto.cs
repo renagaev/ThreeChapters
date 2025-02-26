@@ -1,6 +1,9 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace UseCases.Queries.GetUsers;
 
-[DisplayName("User")]
-public record UserListItemDto(long Id, string Name);
+[DisplayName("UserDto")]
+public record UserListItemDto(
+    [Required] long Id,
+    [Required] string Name);

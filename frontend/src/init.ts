@@ -34,10 +34,10 @@ export function init(debug: boolean): void {
             console.error('Something went wrong mounting the viewport', e);
         })
         .then(() => {
-            viewport.bindCssVars();
+            // viewport.bindCssVars();
         });
 
     // Define components-related CSS variables.
-    miniApp.bindCssVars();
-    themeParams.bindCssVars();
+    // miniApp.bindCssVars();
+    // themeParams.bindCssVars();
 }
