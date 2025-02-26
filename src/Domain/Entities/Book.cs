@@ -6,4 +6,7 @@ public class Book
     public string Title { get; init; }
     public int ChaptersCount { get; init; }
     public string[] TitleVariants { get; init; }
+
+    public Testament Testament { get; init; }
+    public string GroupTitle { get; init; }
 }
