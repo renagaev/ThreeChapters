@@ -1,6 +1,7 @@
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.Implementation.DataAccess.Configurations;
 
@@ -12,5 +13,8 @@ public class BookConfiguration : IEntityTypeConfiguration<Book>
         builder
             .Property(x => x.TitleVariants)
             .HasColumnType("jsonb");
+
+        builder.Property(x => x.Testament)
+            .HasConversion(new EnumToStringConverter<Testament>());
     }
 }
