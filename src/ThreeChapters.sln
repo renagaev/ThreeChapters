@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Tg", "Infras
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure.Implementation.BackgroundJobs", "Infrastructure.Implementation.BackgroundJobs\Infrastructure.Implementation.BackgroundJobs.csproj", "{5A0989C3-B343-46F3-BBA4-4F35B3747038}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controllers", "Controllers\Controllers.csproj", "{B033B61C-62F0-4C0F-AC52-D55FB37C3F49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -64,6 +66,10 @@ Global
 		{5A0989C3-B343-46F3-BBA4-4F35B3747038}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A0989C3-B343-46F3-BBA4-4F35B3747038}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A0989C3-B343-46F3-BBA4-4F35B3747038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B033B61C-62F0-4C0F-AC52-D55FB37C3F49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B033B61C-62F0-4C0F-AC52-D55FB37C3F49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B033B61C-62F0-4C0F-AC52-D55FB37C3F49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B033B61C-62F0-4C0F-AC52-D55FB37C3F49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BED7484B-5DDB-4589-A19C-37BF273FA5CA} = {29FD81F2-5CB5-4DD7-9915-C39CAB419674}
@@ -73,5 +79,6 @@ Global
 		{076FCB94-5CE8-43BD-A136-6DD518B03EDA} = {29FD81F2-5CB5-4DD7-9915-C39CAB419674}
 		{33A15341-653B-4632-BF4C-B609436ACDE0} = {29FD81F2-5CB5-4DD7-9915-C39CAB419674}
 		{5A0989C3-B343-46F3-BBA4-4F35B3747038} = {29FD81F2-5CB5-4DD7-9915-C39CAB419674}
+		{B033B61C-62F0-4C0F-AC52-D55FB37C3F49} = {29FD81F2-5CB5-4DD7-9915-C39CAB419674}
 	EndGlobalSection
 EndGlobal

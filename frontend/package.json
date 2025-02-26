@@ -1,0 +1,51 @@
+{
+  "name": "vuejs-template",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "homepage": "https://telegram-mini-apps.github.io/vuejs-template",
+  "scripts": {
+    "dev": "vite",
+    "dev:https": "cross-env HTTPS=true vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --report-unused-disable-directives --max-warnings 0 --fix",
+    "generate-client": "openapi --input http://localhost:5089/swagger/v1/swagger.json --output ./src/client"
+  },
+  "dependencies": {
+    "@telegram-apps/sdk-vue": "^1.0.4",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-vue-next": "^0.476.0",
+    "pinia": "^3.0.1",
+    "reka-ui": "^2.0.0",
+    "tailwind-merge": "^3.0.2",
+    "tailwindcss-animate": "^1.0.7",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.0",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vue/eslint-config-typescript": "^14.1.3",
+    "@vue/tsconfig": "^0.5.1",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.14.0",
+    "eslint-plugin-vue": "^9.30.0",
+    "gh-pages": "^6.2.0",
+    "npm-run-all2": "^7.0.1",
+    "openapi-typescript-codegen": "^0.23.0",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "~5.6.3",
+    "vite": "^5.4.10",
+    "vite-plugin-mkcert": "^1.17.6",
+    "vite-plugin-vue-devtools": "^7.5.4",
+    "vue-tsc": "^2.1.10"
+  }
+}
