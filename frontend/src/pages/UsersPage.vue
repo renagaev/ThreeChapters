@@ -1,13 +1,7 @@
 <template>
   <div class="contact-list">
     <div v-for="(user, index) in users" :key="user.id">
-      <div class="contact-item">
-        <!-- Показываем первую букву имени как «аватар» -->
-        <el-avatar>{{ user.name[0] }}</el-avatar>
-        <span>{{ user.name }}</span>
-      </div>
-      <!-- Разделитель между элементами (не выводится после последнего) -->
-      <el-divider v-if="index < users.length - 1" />
+      <Button>{{user.name}}</Button>
     </div>
   </div>
 </template>
@@ -15,6 +9,7 @@
 <script setup lang="ts">
 import { useStore } from '@/store'
 import { computed, onMounted } from 'vue'
+import {Button} from "@/components/ui/button";
 
 const store = useStore()
 
