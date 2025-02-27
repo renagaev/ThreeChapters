@@ -40,8 +40,8 @@ const structure = computed(() => store.bibleStructure)
             v-for="book in group.books"
             :key="book.id"
             :read-chapters="readChapters.get(book.id!)?.length ?? 0"
-            :total-chapters="book.chaptersCount"
-            :book-name="book.title"
+            :total-chapters="book.chaptersCount!"
+            :book-name="book.title!"
           />
         </div>
       </div>

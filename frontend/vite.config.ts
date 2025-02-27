@@ -4,8 +4,6 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import mkcert from 'vite-plugin-mkcert'
-import autoprefixer from "autoprefixer";
-import tailwind from 'tailwindcss';
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -13,8 +11,6 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
-    tailwind(),
-    autoprefixer(),
     // Creates a custom SSL certificate valid for the local machine.
     // Using this plugin requires admin rights on the first dev-mode launch.
     // https://www.npmjs.com/package/vite-plugin-mkcert
