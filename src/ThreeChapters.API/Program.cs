@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using ThreeChapters.API.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SupportNonNullableReferenceTypes();
+    c.MapType<DateOnly>(() => new OpenApiSchema { Type = "string", Format = "date" });
     c.CustomSchemaIds(x =>
         x.GetCustomAttributes<DisplayNameAttribute>().SingleOrDefault()?.DisplayName ?? x.Name);
 });

@@ -18,7 +18,7 @@ const structure = computed(() => store.bibleStructure)
 </script>
 
 <template>
-  <div class="p-4 bg-gray-50 min-h-screen">
+  <div class="p-4  min-h-screen">
     <div
       v-for="testament in structure"
       :key="testament.title"

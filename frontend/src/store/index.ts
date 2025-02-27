@@ -8,6 +8,12 @@ export interface User {
   name: string;
 }
 
+export interface UserDetails {
+  id: number;
+  name: string;
+  memberFrom: Date;
+}
+
 export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
@@ -32,5 +38,10 @@ export const useStore = defineStore('store', () => {
 
   }
 
-  return {users, fetchUsers, bibleStructure, fetchBibleStructure, fetchUserReadChapters}
+  async function fetchUserDetails(userId: number): Promise<UserDetails> {
+    const res = await UserService.getUserDetails(userId)
+    return {id: res.id!, name: res.name!, memberFrom: new Date(res.memberFrom!)} as UserDetails
+  }
+
+  return {users, fetchUsers, bibleStructure, fetchBibleStructure, fetchUserReadChapters, fetchUserDetails}
 })

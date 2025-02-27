@@ -10,6 +10,7 @@ export type { BookGroup } from './models/BookGroup';
 export type { ReadBookChapters } from './models/ReadBookChapters';
 export type { StructureBook } from './models/StructureBook';
 export type { StructureTestament } from './models/StructureTestament';
+export type { UserDetails } from './models/UserDetails';
 export type { UserDto } from './models/UserDto';
 
 export { BibleService } from './services/BibleService';
