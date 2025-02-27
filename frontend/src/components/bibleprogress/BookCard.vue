@@ -25,7 +25,7 @@
         </CardContent>
       </Card>
     </DialogTrigger>
-    <DialogContent class="w-96 rounded-md">
+    <DialogScrollContent class="w-96 rounded-md">
       <DialogTitle>{{ bookName }}</DialogTitle>
       <div class="grid grid-cols-8 gap-2 justify-start w-fit">
         <div
@@ -39,7 +39,7 @@
           {{ chapter.number }}
         </div>
       </div>
-    </DialogContent>
+    </DialogScrollContent>
   </Dialog>
 </template>
 
@@ -47,7 +47,7 @@
 import {computed} from 'vue'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import {Progress} from '@/components/ui/progress'
-import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {Dialog, DialogScrollContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 
 const props = defineProps({
   bookName: {
