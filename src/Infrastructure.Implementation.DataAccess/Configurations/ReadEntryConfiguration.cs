@@ -12,5 +12,6 @@ public class ReadEntryConfiguration : IEntityTypeConfiguration<ReadEntry>
         builder.Property(x => x.Date).IsRequired();
         builder.HasOne(x => x.Book);
         builder.HasOne(x => x.Participant);
+        builder.HasIndex(x => x.Date);
     }
 }

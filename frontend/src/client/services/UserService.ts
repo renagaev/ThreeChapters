@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { ReadBookChapters } from '../models/ReadBookChapters';
+import type { UserDetails } from '../models/UserDetails';
 import type { UserDto } from '../models/UserDto';
 
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -18,6 +19,23 @@ export class UserService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users',
+        });
+    }
+
+    /**
+     * @param userId
+     * @returns UserDetails Success
+     * @throws ApiError
+     */
+    public static getUserDetails(
+        userId: number,
+    ): CancelablePromise<UserDetails> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/{userId}',
+            path: {
+                'userId': userId,
+            },
         });
     }
 
