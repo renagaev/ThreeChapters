@@ -12,6 +12,7 @@ public class GetUsersQueryHandler(IDbContext dbContext) : IRequestHandler<GetUse
     {
         var users = await dbContext.Participants
             .Select(x => new { x.Id, x.Name })
+            .OrderBy(x=> x.Id)
             .ToListAsync(cancellationToken);
 
         return users.Select(x => new UserListItemDto(x.Id, x.Name)).ToList();

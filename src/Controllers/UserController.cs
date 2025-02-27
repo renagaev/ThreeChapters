@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using UseCases.Queries.GetUserReadChapters;
 using UseCases.Queries.GetUsers;
 
 namespace Controllers;
@@ -11,5 +12,11 @@ public class UserController(ISender sender) : ControllerBase
     public async Task<ICollection<UserListItemDto>> GetUsersList(CancellationToken cancellationToken)
     {
         return await sender.Send(new GetUsersQuery(), cancellationToken);
+    }
+
+    [HttpGet("{userId:int}/read-chapters", Name = "getUserReadChapters")]
+    public async Task<ICollection<ReadBookChapters>> GetUsersReadChapters(int userId, CancellationToken cancellationToken)
+    {
+        return await sender.Send(new GetUserReadChaptersQuery(userId), cancellationToken);
     }
 }

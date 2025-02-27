@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import BibleProgress from "@/components/bibleprogress/BibleProgress.vue";
 
-const props = defineProps({userId: Number})
+const props = defineProps({userId: {type: Number, required: true}})
 
 
 </script>
 
 <template>
-  <BibleProgress/>
+  <BibleProgress :user-id="props.userId!"/>
 </template>
 
 <style scoped>

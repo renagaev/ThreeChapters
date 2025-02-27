@@ -16,7 +16,8 @@ export const routes = [
   {
     path: '/user/:userId',
     name: 'user',
-    component: UserDetailsPage
+    component: UserDetailsPage,
+    props: true,
   }
 ];
 

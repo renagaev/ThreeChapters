@@ -23,5 +23,14 @@ export const useStore = defineStore('store', () => {
     }
   }
 
-  return {users, fetchUsers, bibleStructure, fetchBibleStructure}
+  async function fetchUserReadChapters(userId: number) {
+    const res = await UserService.getUserReadChapters(userId);
+    return res.reduce((acc, cur) => {
+      acc.set(cur.bookId!, cur.chapters!)
+      return acc
+    }, new Map<number, number[]>());
+
+  }
+
+  return {users, fetchUsers, bibleStructure, fetchBibleStructure, fetchUserReadChapters}
 })
