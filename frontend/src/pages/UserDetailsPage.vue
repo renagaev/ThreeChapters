@@ -43,7 +43,7 @@ function goBack() {
 
       <!-- Информация о пользователе -->
       <div>
-        <h1 class="text-2xl font-bold text-gray-800">{{ user.name }}</h1>
+        <h1 class="text-3xl font-bold text-gray-800">{{ user.name }}</h1>
         <p class="text-sm text-gray-600">
           Участник с {{ user.memberFrom.toLocaleDateString() }}
         </p>

@@ -39,7 +39,7 @@ const structure = computed(() => store.bibleStructure)
           <BookCard
             v-for="book in group.books"
             :key="book.id"
-            :read-chapters="readChapters.get(book.id!)?.length ?? 0"
+            :read-chapters="readChapters.get(book.id!) ?? []"
             :total-chapters="book.chaptersCount!"
             :book-name="book.title!"
           />

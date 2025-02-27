@@ -1,38 +1,53 @@
 <template>
-  <Card
-    :class="[
-      'max-w-xs w-full p-2 space-y-2 rounded-md transition-colors duration-300',
-      statusClasses
-    ]"
-  >
-    <CardHeader class="p-0">
-      <CardTitle
-        class="text-base font-semibold max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
-        :title="bookName"
-      >
-        {{ bookName }}
-      </CardTitle>
-    </CardHeader>
+  <Dialog>
+    <DialogTrigger :disabled="status != 'in-progress'">
+      <Card :class="[  'w-full p-2 space-y-2 rounded-md transition-colors duration-300',
+      statusClasses  ]">
+        <CardHeader class="p-0">
+          <CardTitle
+            class="text-base font-semibold max-w-full overflow-hidden text-ellipsis whitespace-nowrap"
+            :title="bookName">
+            {{ bookName }}
+          </CardTitle>
+        </CardHeader>
 
-    <CardContent class="p-0 space-y-2">
-      <div
-        class="text-sm"
-        :class="statusTextClass"
-      >
-        {{ readChapters }} / {{ totalChapters }}
+        <CardContent class="p-0 space-y-2">
+          <div
+            class="text-sm"
+            :class="statusTextClass"
+          >
+            {{ readChaptersCount }} / {{ totalChapters }}
+          </div>
+          <Progress
+            :model-value="progressValue"
+            class="h-2 rounded-full"
+          />
+        </CardContent>
+      </Card>
+    </DialogTrigger>
+    <DialogContent class="w-96 rounded-md">
+      <DialogTitle>{{ bookName }}</DialogTitle>
+      <div class="grid grid-cols-8 gap-2 justify-start w-fit">
+        <div
+          v-for="chapter in chapters"
+          :key="chapter.number"
+          class="w-9 h-9 rounded-md flex items-center justify-center"
+          :class="chapter.read
+            ? 'bg-primary text-white shadow-lg'
+            : 'bg-gray-100 border border-gray-200 text-gray-400 shadow-inner'"
+        >
+          {{ chapter.number }}
+        </div>
       </div>
-      <Progress
-        :model-value="progressValue"
-        class="h-2 rounded-full"
-      />
-    </CardContent>
-  </Card>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <script setup lang="ts">
 import {computed} from 'vue'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import {Progress} from '@/components/ui/progress'
+import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 
 const props = defineProps({
   bookName: {
@@ -44,15 +59,20 @@ const props = defineProps({
     required: true
   },
   readChapters: {
-    type: Number,
+    type: Array<Number>,
     required: true
   }
 })
 
+const chapters = computed(() => Array.from({length: props.totalChapters}, (_, i) => ({
+  number: i + 1,
+  read: props.readChapters.includes(i + 1)
+})))
+const readChaptersCount = computed(() => props.readChapters.length)
 const status = computed(() => {
-  if (props.readChapters === 0) {
+  if (readChaptersCount.value === 0) {
     return 'not-started'
-  } else if (props.readChapters >= props.totalChapters) {
+  } else if (readChaptersCount.value >= props.totalChapters) {
     return 'finished'
   } else {
     return 'in-progress'
@@ -60,7 +80,7 @@ const status = computed(() => {
 })
 
 const progressValue = computed(() => {
-  const ratio = props.readChapters / props.totalChapters
+  const ratio = readChaptersCount.value / props.totalChapters
   return ratio > 1 ? 100 : Math.round(ratio * 100)
 })
 
@@ -87,5 +107,5 @@ const statusTextClass = computed(() => {
 </script>
 
 <style scoped>
-/* При необходимости можно добавить дополнительные стили */
+/* Дополнительные стили при необходимости */
 </style>
