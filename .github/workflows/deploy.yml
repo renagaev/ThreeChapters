@@ -44,4 +44,5 @@ jobs:
               --env TgSettings__BotToken="${{ secrets.TG_BOT_TOKEN }}" \
               --env TgSettings__ChannelId="${{ secrets.TG_CHANNEL_ID }}" \
               --env TgSettings__DiscussionId="${{ secrets.TG_DISCUSSION_ID }}" \
+              --restart unless-stopped
             -p ${{ secrets.APP_PORT }}:80 ${{ env.image_tag }} 
