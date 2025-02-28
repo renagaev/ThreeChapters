@@ -1,7 +1,7 @@
 <template>
   <Dialog>
     <DialogTrigger :disabled="status != 'in-progress'">
-      <Card :class="[  'w-full p-2 space-y-2 rounded-md transition-colors duration-300',
+      <Card :class="[  'w-full p-2 space-y-2 rounded-md transition-colors duration-300 text-left',
       statusClasses  ]">
         <CardHeader class="p-0">
           <CardTitle
@@ -25,18 +25,18 @@
         </CardContent>
       </Card>
     </DialogTrigger>
-    <DialogScrollContent class="w-96 rounded-md">
+    <DialogScrollContent class="w-84 rounded-md">
       <DialogTitle>{{ bookName }}</DialogTitle>
-      <div class="grid grid-cols-8 gap-2 justify-start w-fit">
+      <div class="grid grid-cols-8 gap-1 justify-start w-fit">
         <div
           v-for="chapter in chapters"
           :key="chapter.number"
-          class="w-9 h-9 rounded-md flex items-center justify-center"
+          class="w-8 h-8 rounded-md flex items-center justify-center"
           :class="chapter.read
             ? 'bg-primary text-white shadow-lg'
             : 'bg-gray-100 border border-gray-200 text-gray-400 shadow-inner'"
         >
-          {{ chapter.number }}
+          <p>{{ chapter.number }}</p>
         </div>
       </div>
     </DialogScrollContent>

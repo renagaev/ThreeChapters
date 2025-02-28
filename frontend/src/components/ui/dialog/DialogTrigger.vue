@@ -8,7 +8,5 @@ const props = defineProps<DialogTriggerProps & { disabled?: boolean }>()
   <DialogTrigger v-if="!props.disabled" v-bind="props">
     <slot/>
   </DialogTrigger>
-  <div v-else>
-    <slot/>
-  </div>
+  <slot v-else/>
 </template>
