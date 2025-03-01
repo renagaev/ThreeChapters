@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // @ts-ignore
 import CalHeatmap, {type Timestamp} from "cal-heatmap";
+// @ts-ignore
+import CalendarLabel from 'cal-heatmap/plugins/CalendarLabel';
 import 'cal-heatmap/cal-heatmap.css';
 import {computed, useTemplateRef, watch} from "vue";
 import dayjs from 'dayjs'
@@ -112,7 +114,13 @@ function paint() {
       height: 16,
       gutter: 3
     }
-  })
+  },[[
+    CalendarLabel, {
+      textAlign: 'start',
+      width: 20,
+      text: () => ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"],
+    }
+  ]])
 }
 
 
