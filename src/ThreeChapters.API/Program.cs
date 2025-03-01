@@ -39,5 +39,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 app.MapControllers();
+app.MapFallbackToFile("/index.html");
 
 app.Run();
