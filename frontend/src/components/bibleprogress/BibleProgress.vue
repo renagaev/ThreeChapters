@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BookCard from "@/components/bibleprogress/BookCard.vue";
-import {computed, onBeforeMount, ref} from "vue";
+import {computed,  onMounted, ref} from "vue";
 import {useStore} from "@/store";
 
 const store = useStore()
@@ -8,9 +8,9 @@ const store = useStore()
 const props = defineProps<{ userId: number }>()
 const readChapters = ref(new Map<number, number[]>())
 
-onBeforeMount(async () => {
+onMounted(async () => {
   store.fetchBibleStructure()
-  readChapters.value = await store.fetchUserReadChapters(props.userId)
+  readChapters.value = await store.fetchUserReadChaptersByBook(props.userId)
 })
 const structure = computed(() => store.bibleStructure)
 

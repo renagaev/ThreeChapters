@@ -17,7 +17,7 @@ export const routes = [
     path: '/user/:userId',
     name: 'user',
     component: UserDetailsPage,
-    props: true,
+    props: (route: unknown) => ({userId: Number(route.params.userId)})
   }
 ];
 
