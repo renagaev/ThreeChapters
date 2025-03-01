@@ -1,12 +1,25 @@
-import {createRouter, createWebHistory} from 'vue-router';
+import {createRouter, createWebHistory, type RouteRecordRaw} from 'vue-router';
 import UsersPage from "@/pages/UsersPage.vue";
 import UserDetailsPage from "@/pages/UserDetailsPage.vue";
+import {retrieveLaunchParams} from '@telegram-apps/sdk';
+import {UserService} from "@/client";
 
-export const routes = [
+export const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'index',
     component: UsersPage,
+    beforeEnter: async (to, from, next) => {
+      const {initDataRaw, initData} = retrieveLaunchParams();
+      if (initData?.user?.id) {
+        const userId = await UserService.getUserIdByTelegramId(initData?.user?.id)
+        if (userId) {
+          next({name: 'user', params: {userId}})
+          return
+        }
+      }
+      next()
+    }
   },
   {
     path: '/users',
@@ -17,9 +30,8 @@ export const routes = [
     path: '/user/:userId',
     name: 'user',
     component: UserDetailsPage,
-    // @ts-ignore
-    props: (route: unknown) => ({userId: Number(route.params.userId)})
-  }
+    props: (route) => ({userId: Number(route.params.userId)})
+  },
 ];
 
 const router = createRouter({
