@@ -4,6 +4,7 @@ import {ref, onBeforeMount} from "vue";
 import {useStore, type UserDetails} from "@/store";
 import {Separator} from "@/components/ui/separator";
 import {useRouter} from "vue-router";
+import UserReadCalendar from "@/components/UserReadCalendar.vue";
 
 const props = defineProps({
   userId: {
@@ -38,7 +39,7 @@ function goBack() {
         @click="goBack"
         class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md"
       >
-        Назад
+        К списку
       </button>
 
       <!-- Информация о пользователе -->
@@ -48,6 +49,8 @@ function goBack() {
           Участник с {{ user.memberFrom.toLocaleDateString() }}
         </p>
       </div>
+
+      <user-read-calendar :user-id="userId"/>
     </div>
     <Separator/>
 

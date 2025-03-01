@@ -14,6 +14,11 @@ export interface UserDetails {
   memberFrom: Date;
 }
 
+export interface DayChaptersRead {
+  date: Date;
+  count: number;
+}
+
 export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
@@ -29,13 +34,17 @@ export const useStore = defineStore('store', () => {
     }
   }
 
-  async function fetchUserReadChapters(userId: number) {
-    const res = await UserService.getUserReadChapters(userId);
+  async function fetchUserReadChaptersByBook(userId: number) {
+    const res = await UserService.getUserReadChaptersByBook(userId);
     return res.reduce((acc, cur) => {
       acc.set(cur.bookId!, cur.chapters!)
       return acc
     }, new Map<number, number[]>());
+  }
 
+  async function fetchUserReadChaptersByDay(userId: number) {
+    const res = await UserService.getUserReadChaptersByDay(userId);
+    return res.map(x => ({date: new Date(x.date!), count: x.count}) as DayChaptersRead)
   }
 
   async function fetchUserDetails(userId: number): Promise<UserDetails> {
@@ -43,5 +52,13 @@ export const useStore = defineStore('store', () => {
     return {id: res.id!, name: res.name!, memberFrom: new Date(res.memberFrom!)} as UserDetails
   }
 
-  return {users, fetchUsers, bibleStructure, fetchBibleStructure, fetchUserReadChapters, fetchUserDetails}
+  return {
+    users,
+    fetchUsers,
+    bibleStructure,
+    fetchBibleStructure,
+    fetchUserReadChaptersByBook,
+    fetchUserReadChaptersByDay,
+    fetchUserDetails
+  }
 })
