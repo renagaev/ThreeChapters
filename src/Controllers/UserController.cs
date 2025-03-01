@@ -16,7 +16,7 @@ public class UserController(ISender sender) : ControllerBase
         return await sender.Send(new GetUsersQuery(), cancellationToken);
     }
 
-    [HttpGet("{userId:int}/read-chapters-by-book", Name = "getUserReadChaptersByBook")]
+    [HttpGet("{userId:int}/read-chapters", Name = "getUserReadChaptersByBook")]
     public async Task<ICollection<ReadBookChapters>> GetUsersReadChapters(int userId, CancellationToken cancellationToken) =>
         await sender.Send(new GetUserReadChaptersQuery(userId), cancellationToken);
 

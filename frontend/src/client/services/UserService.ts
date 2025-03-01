@@ -33,7 +33,7 @@ export class UserService {
     ): CancelablePromise<Array<ReadBookChapters>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/users/{userId}/read-chapters-by-book',
+            url: '/api/v1/users/{userId}/read-chapters',
             path: {
                 'userId': userId,
             },
