@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // @ts-ignore
 import CalHeatmap, {type Timestamp} from "cal-heatmap";
+// @ts-ignore
 import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import 'cal-heatmap/cal-heatmap.css';
 import {computed, useTemplateRef, watch} from "vue";

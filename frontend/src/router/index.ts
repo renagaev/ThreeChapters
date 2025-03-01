@@ -17,6 +17,7 @@ export const routes = [
     path: '/user/:userId',
     name: 'user',
     component: UserDetailsPage,
+    // @ts-ignore
     props: (route: unknown) => ({userId: Number(route.params.userId)})
   }
 ];
