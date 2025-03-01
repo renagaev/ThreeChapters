@@ -18,7 +18,7 @@ const readText = computed(() => {
   }
   const formattedDate = selectedCell.value!.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
   const count = selectedCell.value.count
-  return `${formattedDate}: прочитано ${count} ${getChapterWord(count)}`;
+  return `${formattedDate} прочитал(а) ${count} ${getChapterWord(count)}`;
 });
 function getChapterWord(count: number): string {
   const mod10 = count % 10;
@@ -36,7 +36,7 @@ function getChapterWord(count: number): string {
   return "глав";
 }
 
-function onCellClick(params) {
+function onCellClick(params: { date: number, count: number | null }) {
   const date = new Date(params.date);
   selectedCell.value = {date, count: params.count ?? 0}
 }

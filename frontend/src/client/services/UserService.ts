@@ -74,4 +74,21 @@ export class UserService {
         });
     }
 
+    /**
+     * @param telegramId
+     * @returns number Success
+     * @throws ApiError
+     */
+    public static getUserIdByTelegramId(
+        telegramId?: number,
+    ): CancelablePromise<number> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/by-telegram-id',
+            query: {
+                'telegramId': telegramId,
+            },
+        });
+    }
+
 }
