@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // @ts-ignore
 import CalHeatmap, {type Timestamp} from "cal-heatmap";
+import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import 'cal-heatmap/cal-heatmap.css';
 import {computed, useTemplateRef, watch} from "vue";
 import dayjs from 'dayjs'
@@ -11,9 +12,10 @@ export interface Record {
 }
 
 const props = defineProps<{
-  data: Record[]
+  data: Record[],
+  tooltipFunc: (date: Timestamp, value: number | null) => string
 }>()
-const colorSteps = ["bg-gray-400", "bg-gray-600","bg-gray-800", "bg-primary"];
+const colorClasses = ["bg-gray-400", "bg-gray-600","bg-gray-800", "bg-primary"];
 const stepsRef = useTemplateRef("colorSteps")
 const colors = computed(() => Array.from(stepsRef.value!.children).map(el => getComputedStyle(el).backgroundColor))
 
@@ -78,7 +80,10 @@ function paint() {
       end: dayjs().endOf('day').valueOf()
     },
     data: {
-      source: props.data, x: "date", y: "count"
+      source: props.data,
+      x: "date",
+      y: "count",
+      defaultValue: null
     },
     scale: {
       color: {
@@ -89,7 +94,7 @@ function paint() {
     },
     domain:
       {
-        gutter: 2,
+        gutter: 3,
         type: "month",
         label: {text: 'MMM', textAlign: 'start', position: 'bottom'},
       }
@@ -97,11 +102,14 @@ function paint() {
     subDomain: {
       type: "yyDay",
       radius: 3,
-      width: 14,
-      height: 14,
-      gutter: 2
+      width: 16,
+      height: 16,
+      gutter: 3
     }
-  })
+  }, [[Tooltip, {
+    enabled: true,
+    text: props.tooltipFunc
+  }]])
 }
 
 
@@ -109,7 +117,7 @@ function paint() {
 
 <template>
   <div ref="colorSteps">
-    <div v-for="step in colorSteps" :class="[step]" :key="step"></div>
+    <div v-for="step in colorClasses" :class="[step]" :key="step"></div>
   </div>
   <div id="cal-heatmap" ref="calendar"/>
 </template>

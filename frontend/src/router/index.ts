@@ -1,6 +1,7 @@
 import {createRouter, createWebHistory} from 'vue-router';
 import UsersPage from "@/pages/UsersPage.vue";
 import UserDetailsPage from "@/pages/UserDetailsPage.vue";
+
 export const routes = [
   {
     path: '/',
@@ -16,12 +17,7 @@ export const routes = [
     path: '/user/:userId',
     name: 'user',
     component: UserDetailsPage,
-    props: {
-      userId: {
-        type: Number,
-        required: true,
-      }
-    }
+    props: (route: unknown) => ({userId: Number(route.params.userId)})
   }
 ];
 
