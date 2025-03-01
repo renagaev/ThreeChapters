@@ -1,8 +1,6 @@
 <script setup lang="ts">
 // @ts-ignore
 import CalHeatmap, {type Timestamp} from "cal-heatmap";
-// @ts-ignore
-import Tooltip from 'cal-heatmap/plugins/Tooltip';
 import 'cal-heatmap/cal-heatmap.css';
 import {computed, useTemplateRef, watch} from "vue";
 import dayjs from 'dayjs'
@@ -13,10 +11,13 @@ export interface Record {
 }
 
 const props = defineProps<{
-  data: Record[],
-  tooltipFunc: (date: Timestamp, value: number | null) => string
+  data: Record[]
 }>()
-const colorClasses = ["bg-gray-400", "bg-gray-600","bg-gray-800", "bg-primary"];
+
+const emit = defineEmits<{
+  (e: 'clicked', params: { date: number, count: number | null }): void
+}>()
+const colorClasses = ["bg-gray-400", "bg-gray-600", "bg-gray-800", "bg-primary"];
 const stepsRef = useTemplateRef("colorSteps")
 const colors = computed(() => Array.from(stepsRef.value!.children).map(el => getComputedStyle(el).backgroundColor))
 
@@ -61,6 +62,10 @@ function yyDaysTemplate(DateHelper: CalHeatmap.DateHelper, options: CalHeatmap.O
 }
 
 const cal: CalHeatmap = new CalHeatmap({});
+cal.on("click", (event: PointerEvent, timestamp: number, value: number | null): void => emit("clicked", {
+  date: timestamp,
+  count: value
+}))
 watch(() => props.data.length, (v) => {
   if (v > 0) {
     paint()
@@ -107,10 +112,7 @@ function paint() {
       height: 16,
       gutter: 3
     }
-  }, [[Tooltip, {
-    enabled: true,
-    text: props.tooltipFunc
-  }]])
+  })
 }
 
 
