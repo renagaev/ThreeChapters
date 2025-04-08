@@ -8,4 +8,5 @@ public class Participant
     public long? TelegramId { get; init; }
     public bool IsActive { get; set; } = true;
     public ICollection<ReadEntry> ReadEntries { get; set; } = [];
+    public string? AvatarPath { get; set; }
 }

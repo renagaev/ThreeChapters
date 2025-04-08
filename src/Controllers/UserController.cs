@@ -1,5 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using UseCases.GetUserAvatar;
 using UseCases.Queries.GetUserDailyChaptersRead;
 using UseCases.Queries.GetUserDetails;
 using UseCases.Queries.GetUserIdByTelegramId;
@@ -31,4 +33,13 @@ public class UserController(ISender sender) : ControllerBase
     [HttpGet("by-telegram-id", Name = "getUserIdByTelegramId")]
     public async Task<long?> GetUserIdByTelegramId(long telegramId, CancellationToken cancellationToken) =>
        await sender.Send(new GetUserIdByTelegramIdQuery(telegramId), cancellationToken);
+
+    [HttpGet("{userId:int}/avatar/{fileName}", Name = "getUserAvatar")]
+    [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 60*60*24*7)]
+    public async Task<FileStreamResult> GetUserAvatar(int userId, string fileName, CancellationToken cancellationToken)
+    {
+        var stream = await sender.Send(new GetUserAvatarCommand(userId), cancellationToken);
+        new FileExtensionContentTypeProvider().TryGetContentType(fileName, out var contentType);
+        return new FileStreamResult(stream, contentType ?? "application/octet-stream");
+    }
 }
