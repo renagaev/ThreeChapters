@@ -35,7 +35,7 @@ public class UserController(ISender sender) : ControllerBase
        await sender.Send(new GetUserIdByTelegramIdQuery(telegramId), cancellationToken);
 
     [HttpGet("{userId:int}/avatar/{fileName}", Name = "getUserAvatar")]
-    [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 60*60*24*7)]
+    // [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 60*60*24*7)]
     public async Task<FileStreamResult> GetUserAvatar(int userId, string fileName, CancellationToken cancellationToken)
     {
         var stream = await sender.Send(new GetUserAvatarCommand(userId), cancellationToken);
