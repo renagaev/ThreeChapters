@@ -17,7 +17,9 @@ const props = defineProps({
 const user = ref<UserDetails>({
   id: 0,
   name: "",
-  memberFrom: new Date()
+  memberFrom: new Date(),
+  hasAvatar: false,
+  avatarUrl: ""
 })
 
 const store = useStore()

@@ -26,7 +26,7 @@ export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
 
-  function getAvatarUrl(path: string, id: number) {
+  function getAvatarUrl(path: string | null | undefined, id: number) {
     return path ?
       `${OpenAPI.BASE}/api/v1/users/${id}/avatar/${path}`
       : `https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=${id}&scale=120`
@@ -35,7 +35,7 @@ export const useStore = defineStore('store', () => {
   async function fetchUsers() {
     const res = await UserService.getUsers()
     users.value = res.map(u => {
-      return {id: u.id!, name: u.name!, avatarUrl: getAvatarUrl(u.avatar, u.id)}
+      return {id: u.id!, name: u.name!, avatarUrl: getAvatarUrl(u.avatar, u.id!)}
     })
   }
 
@@ -65,7 +65,7 @@ export const useStore = defineStore('store', () => {
       name: res.name!,
       memberFrom: new Date(res.memberFrom!),
       hasAvatar: !!res.avatar,
-      avatarUrl: getAvatarUrl(res.avatar, res.id)
+      avatarUrl: getAvatarUrl(res.avatar, res.id!)
     } as UserDetails
   }
 
