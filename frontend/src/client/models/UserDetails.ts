@@ -6,5 +6,6 @@ export type UserDetails = {
     id?: number;
     name?: string;
     memberFrom?: string;
+    avatar?: string | null;
 };
 

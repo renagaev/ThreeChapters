@@ -1,17 +1,20 @@
 import {defineStore} from "pinia";
 import type {StructureTestament} from "@/client";
-import {BibleService, UserService} from "@/client";
+import {BibleService, OpenAPI, UserService} from "@/client";
 import {ref} from "vue";
 
 export interface User {
   id: number;
   name: string;
+  avatarUrl: string
 }
 
 export interface UserDetails {
   id: number;
   name: string;
   memberFrom: Date;
+  avatarUrl: string
+  hasAvatar: boolean
 }
 
 export interface DayChaptersRead {
@@ -23,9 +26,17 @@ export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
 
+  function getAvatarUrl(path: string, id: number) {
+    return path ?
+      `${OpenAPI.BASE}/api/v1/users/${id}/avatar/${path}`
+      : `https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=${id}&scale=120`
+  }
+
   async function fetchUsers() {
     const res = await UserService.getUsers()
-    users.value = res.map(u => u as User)
+    users.value = res.map(u => {
+      return {id: u.id!, name: u.name!, avatarUrl: getAvatarUrl(u.avatar, u.id)}
+    })
   }
 
   async function fetchBibleStructure() {
@@ -49,7 +60,13 @@ export const useStore = defineStore('store', () => {
 
   async function fetchUserDetails(userId: number): Promise<UserDetails> {
     const res = await UserService.getUserDetails(userId)
-    return {id: res.id!, name: res.name!, memberFrom: new Date(res.memberFrom!)} as UserDetails
+    return {
+      id: res.id!,
+      name: res.name!,
+      memberFrom: new Date(res.memberFrom!),
+      hasAvatar: !!res.avatar,
+      avatarUrl: getAvatarUrl(res.avatar, res.id)
+    } as UserDetails
   }
 
   return {

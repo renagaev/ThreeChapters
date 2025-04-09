@@ -5,6 +5,7 @@ import {useStore, type UserDetails} from "@/store";
 import {Separator} from "@/components/ui/separator";
 import {useRouter} from "vue-router";
 import UserReadCalendar from "@/components/UserReadCalendar.vue";
+import {Avatar, AvatarImage} from "@/components/ui/avatar";
 
 const props = defineProps({
   userId: {
@@ -37,18 +38,25 @@ function goBack() {
       <!-- Кнопка назад -->
       <button
         @click="goBack"
-        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md"
+        class="px-3 py-1 bg-gray-100 text-gray-700 rounded-md"
       >
         К списку
       </button>
 
-      <!-- Информация о пользователе -->
-      <div>
-        <h1 class="text-3xl font-bold text-gray-800">{{ user.name }}</h1>
-        <p class="text-normal text-gray-600">
-          Участник с {{ user.memberFrom.toLocaleDateString() }}
-        </p>
+      <div class="flex items-center">
+        <div v-if="user.hasAvatar" class="mr-4">
+          <Avatar class="w-28 h-28  ">
+            <AvatarImage :src="user.avatarUrl" class="border"></AvatarImage>
+          </Avatar>
+        </div>
+        <div>
+          <h1 class="text-4xl font-bold text-gray-800">{{ user.name }}</h1>
+          <p class="text-normal text-gray-600">
+            Участник с {{ user.memberFrom.toLocaleDateString() }}
+          </p>
+        </div>
       </div>
+
 
 
     </div>

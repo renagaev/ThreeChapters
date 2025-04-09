@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Domain\Domain.csproj" />
       <ProjectReference Include="..\Infrastructure.Interfaces.DataAccess\Infrastructure.Interfaces.DataAccess.csproj" />
+      <ProjectReference Include="..\Infrastructure.Interfaces.S3\Infrastructure.Interfaces.S3.csproj" />
     </ItemGroup>
 
     <ItemGroup>

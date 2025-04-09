@@ -11,10 +11,16 @@ public class GetUsersQueryHandler(IDbContext dbContext) : IRequestHandler<GetUse
     public async Task<ICollection<UserListItemDto>> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         var users = await dbContext.Participants
-            .Select(x => new { x.Id, x.Name })
-            .OrderBy(x=> x.Id)
+            .Select(x => new { x.Id, x.Name, x.AvatarPath })
+            .OrderBy(x => x.Id)
             .ToListAsync(cancellationToken);
+        var res = new List<UserListItemDto>();
+        foreach (var user in users)
+        {
+            var avatar = user.AvatarPath != null ? Path.GetFileName(user.AvatarPath) : null;
+            res.Add(new UserListItemDto(user.Id, user.Name, avatar));
+        }
 
-        return users.Select(x => new UserListItemDto(x.Id, x.Name)).ToList();
+        return res;
     }
 }

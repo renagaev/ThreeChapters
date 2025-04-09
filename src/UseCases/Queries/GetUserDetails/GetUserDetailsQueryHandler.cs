@@ -15,6 +15,8 @@ public class GetUserDetailsQueryHandler(IDbContext dbContext) : IRequestHandler<
             throw new Exception("User not found");
         }
 
-        return new UserDetailsDto(user.Id, user.Name, user.MemberFrom);
+        var avatar = user.AvatarPath != null ? Path.GetFileName(user.AvatarPath) : null;
+
+        return new UserDetailsDto(user.Id, user.Name, user.MemberFrom, avatar);
     }
 }

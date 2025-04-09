@@ -91,4 +91,24 @@ export class UserService {
         });
     }
 
+    /**
+     * @param userId
+     * @param fileName
+     * @returns any Success
+     * @throws ApiError
+     */
+    public static getUserAvatar(
+        userId: number,
+        fileName: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/{userId}/avatar/{fileName}',
+            path: {
+                'userId': userId,
+                'fileName': fileName,
+            },
+        });
+    }
+
 }
