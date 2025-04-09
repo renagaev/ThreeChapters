@@ -14,6 +14,7 @@ const props = defineProps({
   }
 })
 
+
 const user = ref<UserDetails>({
   id: 0,
   name: "",
