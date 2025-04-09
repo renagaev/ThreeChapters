@@ -3,6 +3,7 @@ import {useStore} from '@/store'
 import {computed, onMounted} from 'vue'
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {useRouter} from "vue-router";
+import {type UserDto, UserService} from "@/client";
 
 const store = useStore()
 const router = useRouter()
@@ -11,10 +12,6 @@ onMounted(() => {
   store.fetchUsers()
 })
 const users = computed(() => store.users)
-
-function getAvatarUrl(name: string) {
-  return `https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=${encodeURIComponent(name)}&scale=120`
-}
 
 function goToUserPage(userId: number) {
   router.push(`/user/${userId}`)
@@ -30,12 +27,12 @@ function goToUserPage(userId: number) {
       class="flex items-center space-x-3 p-2 border"
       @click="goToUserPage(user.id)"
     >
-      <Avatar class="w-9 h-9 border border-black rounded-full overflow-hidden">
-        <AvatarImage :src="getAvatarUrl(user.name)" :alt="`Avatar of ${user.name}`"/>
+      <Avatar class="w-12 h-12  border border-black rounded-full overflow-hidden">
+        <AvatarImage :src="user.avatarUrl" :alt="`Avatar of ${user.name}`"/>
         <AvatarFallback>{{ user.name.charAt(0) }}</AvatarFallback>
       </Avatar>
       <div>
-        <p class="text-base  font-medium">{{ user.name }}</p>
+        <p class="text-lg  font-medium">{{ user.name }}</p>
       </div>
     </div>
   </div>
