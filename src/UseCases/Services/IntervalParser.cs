@@ -40,7 +40,7 @@ public partial class IntervalParser : IIntervalParser
             return chapters.Select(chapter => new ReadInterval(book, chapter, book, chapter));
         });
 
-    [GeneratedRegex(@"book_(?<startbook>\d+)_\s+(?<start>\d+)\s*-\s*book_(?<endbook>\d+)_\s*(?<end>\d+)")]
+    [GeneratedRegex(@"book_(?<startbook>\d+)_\s*(?<start>\d+)\s*-\s*book_(?<endbook>\d+)_\s*(?<end>\d+)")]
     private static partial Regex MultibooksRegex();
 
     private static IEnumerable<ReadInterval> FindMultiBookEntries(string text) =>
@@ -66,7 +66,7 @@ public partial class IntervalParser : IIntervalParser
         });
 
 
-    [GeneratedRegex(@"book_(?<book>\d+)_[\s\:]+(?<start>\d+)\s*-\s*(?<end>\d+)")]
+    [GeneratedRegex(@"book_(?<book>\d+)_[\s\:]*(?<start>\d+)\s*-\s*(?<end>\d+)")]
     private static partial Regex SingleBookRegex();
 
     private static IEnumerable<ReadInterval> FindSingleBookEntries(string text) =>
