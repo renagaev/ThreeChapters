@@ -6,7 +6,7 @@ import {UserService} from "@/client";
 
 export const routes: RouteRecordRaw[] = [
   {
-    path: '/my',
+    path: '/',
     name: 'index',
     component: UsersPage,
     beforeEnter: async (to, from, next) => {
@@ -32,6 +32,11 @@ export const routes: RouteRecordRaw[] = [
     component: UserDetailsPage,
     props: (route) => ({userId: Number(route.params.userId)})
   },
+  {
+    path: '/:catchAll(.*)',
+    name: 'not-found',
+    redirect: {name: 'index'},
+  }
 ];
 
 const router = createRouter({
