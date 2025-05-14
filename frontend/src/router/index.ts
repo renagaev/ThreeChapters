@@ -6,7 +6,7 @@ import {UserService} from "@/client";
 
 export const routes: RouteRecordRaw[] = [
   {
-    path: '/',
+    path: '/my',
     name: 'index',
     component: UsersPage,
     beforeEnter: async (to, from, next) => {
