@@ -15,15 +15,18 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
 {
     public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
         await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
+
     private async Task UpdateSeries(DateOnly date, ChatId chatId, int messageId, CancellationToken cancellationToken)
     {
-        var rawSeries = await dbContext.Participants.Select(x => new
-        {
-            participant = x,
-            dates = x.ReadEntries.Select(x => x.Date)
-                .Where(x => x <= date)
-                .Distinct()
-        }).ToListAsync(cancellationToken);
+        var rawSeries = await dbContext.Participants
+            .Where(x => x.IsActive)
+            .Select(x => new
+            {
+                participant = x,
+                dates = x.ReadEntries.Select(x => x.Date)
+                    .Where(x => x <= date)
+                    .Distinct()
+            }).ToListAsync(cancellationToken);
 
         var lengths = new List<(Participant participant, int curr, int max)>();
         foreach (var series in rawSeries)
