@@ -1,5 +1,3 @@
-using System.Globalization;
-using System.Text;
 using Domain.Entities;
 using Infrastructure.Interfaces.DataAccess;
 using MediatR;
@@ -7,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
-using UseCases.Notifications;
+using UseCases.Services;
 using UseCases.Settings;
 
 namespace UseCases.AddDailyPost;
@@ -18,6 +16,8 @@ public class AddDailyPostCommandHandler(
     ITelegramBotClient botClient,
     IDbContext dbContext,
     ILogger<AddDailyPostCommandHandler> logger,
+    DailyPostRenderer dailyPostRenderer,
+    IMediator notificationPublisher,
     IOptionsSnapshot<TgSettings> options) : IRequestHandler<AddDailyPostCommand>
 {
     public async Task Handle(AddDailyPostCommand request, CancellationToken cancellationToken)
@@ -29,30 +29,22 @@ public class AddDailyPostCommandHandler(
             logger.LogInformation("Skipped post creation: post already exists");
             return;
         }
-        
-        var culture = CultureInfo.CreateSpecificCulture("ru-RU");
-        var todayStr = DateTime.Today.ToString("dd MMMM yyyy", culture);
+
         var participants = await dbContext.Participants
             .Where(x => x.IsActive)
-            .OrderBy(x => x.Id)
-            .Select(x => x.Name)
+            .OrderBy(x => x)
             .ToListAsync(cancellationToken);
 
-        var post = new StringBuilder(todayStr);
-        post.Append("\n\n");
-        foreach (var participant in participants)
-        {
-            post.Append($"{Constants.UnreadMark} {participant}\n");
-        }
+        var post = dailyPostRenderer.RenderDailyMessage(today, participants, []);
 
-        var sentPost = await botClient.SendMessage(options.Value.ChannelId, post.ToString(),
-            cancellationToken: cancellationToken);
-        dbContext.DailyPosts.Add(new DailyPost
+        var sentPost = await botClient.SendMessage(options.Value.ChannelId, post, cancellationToken: cancellationToken);
+        var dailyPost = new DailyPost
         {
             Date = today,
             MessageId = sentPost.MessageId,
             ChatId = sentPost.Chat.Id
-        });
+        };
+        dbContext.DailyPosts.Add(dailyPost);
         await dbContext.SaveChangesAsync(cancellationToken);
     }
 }

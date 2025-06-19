@@ -1,3 +1,5 @@
+using System.Globalization;
+using System.Text.RegularExpressions;
 using Domain.Entities;
 using Infrastructure.Interfaces.DataAccess;
 using MediatR;
@@ -6,15 +8,44 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using UseCases.Notifications;
 
 namespace UseCases.UpdateSeries;
 
 public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotClient botClient)
-    : INotificationHandler<ReadIntervalsUpdatedNotification>
+    : INotificationHandler<ReadIntervalsUpdatedNotification>, IRequestHandler<PostSeriesMessageCommand>
 {
     public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
-        await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
+        await UpdateSeries(notification.DailyPost.Date, notification.DailyPost.ChatId, notification.DailyPost.MessageId, cancellationToken);
+    
+    public async Task Handle(PostSeriesMessageCommand request, CancellationToken cancellationToken)
+    {
+        var source = request.Message.ForwardOrigin as MessageOriginChannel;
+        var sourcePost =
+            await dbContext.DailyPosts.FirstOrDefaultAsync(x => x.MessageId == source.MessageId, cancellationToken);
+
+        var date = sourcePost?.Date;
+        if (date == null)
+        {
+            var match = Regex.Match(request.Message.Text!, @"(\d+) (\w+) (\d\d\d\d)");
+            if (match.Success)
+            {
+                date = DateOnly.ParseExact(match.Value, "d MMMM yyyy", CultureInfo.GetCultureInfo("ru-RU"));
+            }
+            else
+            {
+                return;
+            }
+            
+        }
+
+        var exists = await dbContext.SeriesMessages.AnyAsync(x => x.Date == date, cancellationToken);
+        if (exists)
+        {
+            return;
+        }
+
+        await UpdateSeries(date.Value, request.Message.Chat.Id, request.Message.Id, cancellationToken);
+    }
 
     private async Task UpdateSeries(DateOnly date, ChatId chatId, int messageId, CancellationToken cancellationToken)
     {

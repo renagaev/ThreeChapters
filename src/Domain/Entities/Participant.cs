@@ -9,4 +9,5 @@ public class Participant
     public bool IsActive { get; set; } = true;
     public ICollection<ReadEntry> ReadEntries { get; set; } = [];
     public string? AvatarPath { get; set; }
+    public bool IsAdmin { get; set; }
 }

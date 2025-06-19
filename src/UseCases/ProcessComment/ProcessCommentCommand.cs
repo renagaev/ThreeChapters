@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Domain.Entities;
 using Infrastructure.Interfaces.DataAccess;
@@ -17,58 +18,140 @@ public class ProcessCommentCommandHandler(
     IDbContext dbContext,
     IIntervalParser intervalParser,
     IntervalMerger merger,
+    IntervalSplitter splitter,
+    DailyPostRenderer dailyPostRenderer,
     ILogger<ProcessCommentCommandHandler> logger)
     : IRequestHandler<ProcessCommentCommand>
 {
     public async Task Handle(ProcessCommentCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Received comment from user {userId} {username} with text {text}", request.Message.From.Id, request.Message.From.Username, request.Message.Text);
         var message = request.Message;
-        var text = message.Text ?? message.Caption;
-        if (text is not { Length: > 0 })
+
+        if (!IsMessageValid(message, out var text, out var sourceMessage))
         {
-            logger.LogInformation("Skipping empty message");
+            logger.LogInformation("Received invalid comment: {Text}", text ?? "null");
             return;
         }
 
-        var user = await dbContext.Participants.FirstOrDefaultAsync(x => x.TelegramId == message.From.Id,
-            cancellationToken);
+        var user = await dbContext.Participants
+            .FirstOrDefaultAsync(x => x.TelegramId == message.From!.Id, cancellationToken);
+
         if (user is null)
         {
-            logger.LogInformation("Skipping message from unknown user: {TelegramUsername}", message.From.Username);
+            logger.LogInformation("Skipping message from unknown user: {TelegramUsername}", message.From!.Username);
             return;
         }
 
-        var books = dbContext.Books.ToList();
-        var intervals = intervalParser.Parse(text, books);
-        if (intervals.Count == 0)
+        if (user.IsAdmin && TryParseAdminCommand(text, out var username))
         {
-            logger.LogInformation("Skipping message with no read entries, message: {MessageText}", text);
+            user = await dbContext.Participants.FirstOrDefaultAsync(
+                x => x.Name.ToLower() == username.ToLower(), cancellationToken);
+            if (user is null)
+            {
+                return;
+            }
+        }
+
+
+        var books = await dbContext.Books.ToListAsync(cancellationToken);
+
+        ICollection<ReadInterval> intervals = [];
+        if (text.Contains("clear"))
+        {
+            intervals = [];
+        }
+        else
+        {
+            intervals = intervalParser.Parse(text, books);
+            if (intervals.Count == 0)
+            {
+                logger.LogInformation("Skipping message with no read entries: {Text}", text);
+                return;
+            }
+        }
+
+        var dailyPost = await dbContext.DailyPosts
+            .FirstOrDefaultAsync(x => x.MessageId == sourceMessage.MessageId && x.ChatId == sourceMessage.Chat.Id,
+                cancellationToken);
+
+        if (dailyPost is null)
+        {
+            logger.LogInformation("Skipping message from unknown daily post: {MessageId}", sourceMessage.MessageId);
             return;
         }
 
         var mergedIntervals = merger.Merge(intervals, books);
-        await UpdateMessage(message, user, books, mergedIntervals, cancellationToken);
+        var readEntries = mergedIntervals
+            .SelectMany(x => splitter.Split(x, books))
+            .Select(x => new ReadEntry
+            {
+                ParticipantId = user.Id,
+                BookId = x.Book,
+                StartChapter = x.StartChapter,
+                EndChapter = x.EndChapter,
+                Date = dailyPost.Date
+            })
+            .ToList();
+
+        await UpdateUserReadEntries(user.Id, dailyPost.Date, readEntries, cancellationToken);
+        await UpdateDailyPostMessage(dailyPost, books, cancellationToken);
     }
 
-    private async Task UpdateMessage(Message message, Participant participant, ICollection<Book> books, ICollection<ReadInterval> readIntervals, CancellationToken cancellationToken)
+    private bool IsMessageValid(Message message, [NotNullWhen(true)] out string? text,
+        out MessageOriginChannel sourceMessage)
     {
-        var bookById = books.ToDictionary(x => x.Id, x => x.Title);
-        var renderedIntervals = string.Join(", ", readIntervals.Select(x => x switch
+        if (message.ReplyToMessage?.ForwardOrigin is not MessageOriginChannel channelOrigin)
         {
-            _ when x.StartBook == x.EndBook && x.StartChapter == x.EndChapter => $"{bookById[x.StartBook]} {x.StartChapter}",
-            _ when x.StartBook == x.EndBook => $"{bookById[x.StartBook]} {x.StartChapter}-{x.EndChapter}",
-            _ => $"{bookById[x.StartBook]} {x.StartChapter} - {bookById[x.EndBook]} {x.EndChapter}"
-        }));
-        var source = message.ReplyToMessage!.Text!;
-        var newMessage = Regex.Replace(source, $@"[{Constants.ReadMark}{Constants.UnreadMark}]\s*{participant.Name}(:.*)*", $"{Constants.ReadMark} {participant.Name}: {renderedIntervals}");
-        if (source == newMessage)
-        {
-            logger.LogError("Failed to find  user in message {User}", participant.Name);
-            return;
+            text = null;
+            sourceMessage = null!;
+            return false;
         }
 
-        var sourceMessage = message.ReplyToMessage.ForwardOrigin as MessageOriginChannel;
-        await botClient.EditMessageText(sourceMessage!.Chat.Id, sourceMessage.MessageId, newMessage, cancellationToken: cancellationToken);
+        sourceMessage = channelOrigin;
+        text = message.Text ?? message.Caption;
+
+        return !string.IsNullOrWhiteSpace(text);
+    }
+
+    private async Task UpdateUserReadEntries(long userId, DateOnly date, List<ReadEntry> newEntries,
+        CancellationToken ct)
+    {
+        var existingEntries = await dbContext.ReadEntries
+            .Where(e => e.ParticipantId == userId && e.Date == date)
+            .ToListAsync(ct);
+
+        dbContext.ReadEntries.RemoveRange(existingEntries);
+        dbContext.ReadEntries.AddRange(newEntries);
+
+        await dbContext.SaveChangesAsync(ct);
+    }
+
+    private bool TryParseAdminCommand(string text, out string username)
+    {
+        var match = Regex.Match(text, @"admin ([А-Яа-я|\w|\s]+):.*");
+        if (match.Success)
+        {
+            username = match.Groups[1].Value;
+            return true;
+        }
+
+        username = string.Empty;
+        return false;
+    }
+
+    private async Task UpdateDailyPostMessage(DailyPost dailyPost, ICollection<Book> books, CancellationToken ct)
+    {
+        var participants = await dbContext.Participants
+            .Where(p => p.IsActive)
+            .Include(p => p.ReadEntries.Where(e => e.Date == dailyPost.Date))
+            .ToListAsync(ct);
+
+        var rendered = dailyPostRenderer.RenderDailyMessage(dailyPost.Date, participants, books);
+
+        await botClient.EditMessageText(
+            chatId: dailyPost.ChatId,
+            messageId: dailyPost.MessageId,
+            text: rendered,
+            cancellationToken: ct);
     }
 }
