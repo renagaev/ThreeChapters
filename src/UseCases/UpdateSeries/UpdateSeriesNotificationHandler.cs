@@ -14,7 +14,7 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
     : INotificationHandler<ReadIntervalsUpdatedNotification>
 {
     public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
-        await UpdateSeries(notification.Date, notification.ChatId, notification.MessageId, cancellationToken);
+        await UpdateSeries(notification.DailyPost.Date, notification.DailyPost.ChatId, notification.DailyPost.MessageId, cancellationToken);
 
     private async Task UpdateSeries(DateOnly date, ChatId chatId, int messageId, CancellationToken cancellationToken)
     {

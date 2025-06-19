@@ -13,7 +13,7 @@ public class DailyPostRendererTests
         var book = CreateBook(0, "Книга 1");
         var user = CreateParticipant("Иван", [CreateReadEntry(1, book.Id, 3, 3)]);
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user], [book]);
 
         var expected = """
@@ -33,7 +33,7 @@ public class DailyPostRendererTests
         var book = CreateBook(0, "Книга 1");
         var user = CreateParticipant("Иван", [CreateReadEntry(1, book.Id, 3, 5)]);
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user], [book]);
 
         var expected = """
@@ -58,7 +58,7 @@ public class DailyPostRendererTests
             CreateReadEntry(2, book2.Id, 1, 3)
         ]);
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user], [book1, book2]);
 
         var expected = """
@@ -81,7 +81,7 @@ public class DailyPostRendererTests
         var user2 = CreateParticipant("Мария", []);
         var user3 = CreateParticipant("Петр", [CreateReadEntry(2, book.Id, 3, 3)]);
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user1, user2, user3], [book]);
 
         var expected = """
@@ -100,7 +100,7 @@ public class DailyPostRendererTests
     [Fact]
     public void Should_RenderEmptyParticipantList()
     {
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [], []);
 
         var expected = """
@@ -123,7 +123,7 @@ public class DailyPostRendererTests
             CreateReadEntry(2, book2.Id, 1, 3)
         ]);
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user], [book1, book2]);
 
         var expected = """
@@ -146,7 +146,7 @@ public class DailyPostRendererTests
         var user2 = CreateParticipant("Мария", [CreateReadEntry(2, book.Id, 2, 3)]); // 2 главы
         var user3 = CreateParticipant("Петр", [CreateReadEntry(3, book.Id, 4, 6)]); // 3 главы
 
-        var renderer = new DailyMessageRenderer(_intervalMerger);
+        var renderer = new DailyPostRenderer(_intervalMerger);
         var result = renderer.RenderDailyMessage(new DateOnly(2025, 6, 19), [user1, user2, user3], [book]);
 
         var expected = """

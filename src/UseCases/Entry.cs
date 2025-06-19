@@ -11,8 +11,8 @@ public static class Entry
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
         services.AddSingleton<IntervalMerger>();
         services.AddSingleton<IIntervalParser, IntervalParser>();
-        services.AddSingleton<ReportParser>();
         services.AddSingleton<IntervalSplitter>();
+        services.AddSingleton<DailyPostRenderer>();
         return services;
     }
 }

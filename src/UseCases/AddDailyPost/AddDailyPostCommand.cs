@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
+using UseCases.Notifications;
 using UseCases.Services;
 using UseCases.Settings;
 
@@ -16,7 +17,8 @@ public class AddDailyPostCommandHandler(
     ITelegramBotClient botClient,
     IDbContext dbContext,
     ILogger<AddDailyPostCommandHandler> logger,
-    DailyMessageRenderer dailyMessageRenderer,
+    DailyPostRenderer dailyPostRenderer,
+    IMediator notificationPublisher,
     IOptionsSnapshot<TgSettings> options) : IRequestHandler<AddDailyPostCommand>
 {
     public async Task Handle(AddDailyPostCommand request, CancellationToken cancellationToken)
@@ -34,16 +36,20 @@ public class AddDailyPostCommandHandler(
             .OrderBy(x => x)
             .ToListAsync(cancellationToken);
 
-        var post = dailyMessageRenderer.RenderDailyMessage(today, participants, []);
+        var post = dailyPostRenderer.RenderDailyMessage(today, participants, []);
 
         var sentPost = await botClient.SendMessage(options.Value.ChannelId, post,
             cancellationToken: cancellationToken);
-        dbContext.DailyPosts.Add(new DailyPost
+        var dailyPost = new DailyPost
         {
             Date = today,
             MessageId = sentPost.MessageId,
             ChatId = sentPost.Chat.Id
-        });
+        };
+        dbContext.DailyPosts.Add(dailyPost);
         await dbContext.SaveChangesAsync(cancellationToken);
+        
+        var notification = new ReadIntervalsUpdatedNotification(dailyPost);
+        await notificationPublisher.Publish(notification, cancellationToken);
     }
 }
