@@ -16,7 +16,7 @@ RUN dotnet restore ThreeChapters.API/ThreeChapters.API.csproj
 COPY src ./
 RUN dotnet publish ThreeChapters.API/ThreeChapters.API.csproj --output ./publish
 
-FROM node:23-alpine AS frontend 
+FROM node:24-alpine AS frontend 
 
 WORKDIR app
 
