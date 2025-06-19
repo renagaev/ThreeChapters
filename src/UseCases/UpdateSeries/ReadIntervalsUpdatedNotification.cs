@@ -1,7 +1,6 @@
 using Domain.Entities;
 using MediatR;
-using Telegram.Bot.Types;
 
-namespace UseCases.Notifications;
+namespace UseCases.UpdateSeries;
 
 public record ReadIntervalsUpdatedNotification(DailyPost DailyPost) : INotification;

@@ -8,6 +8,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using UseCases.ProcessComment;
 using UseCases.Settings;
+using UseCases.UpdateSeries;
 
 namespace Infrastructure.Tg;
 
@@ -30,6 +31,10 @@ internal class UpdateHandler(IServiceScopeFactory scopeFactory, IOptions<TgSetti
         if (message.ReplyToMessage?.ForwardOrigin is MessageOriginChannel channel && channel.Chat.Id == options.Value.ChannelId)
         {
             await sender.Send(new ProcessCommentCommand(message), cancellationToken);
+        }
+        if (message.ForwardFromChat is { Type: ChatType.Channel } sourceChannel && sourceChannel.Id == options.Value.ChannelId)
+        {
+            await sender.Send(new PostSeriesMessageCommand(message), cancellationToken);
         }
     }
 
