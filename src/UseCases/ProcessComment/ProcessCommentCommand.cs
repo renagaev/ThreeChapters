@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using UseCases.Services;
+using UseCases.UpdateSeries;
 
 namespace UseCases.ProcessComment;
 
@@ -20,6 +21,7 @@ public class ProcessCommentCommandHandler(
     IntervalMerger merger,
     IntervalSplitter splitter,
     DailyPostRenderer dailyPostRenderer,
+    IMediator mediator,
     ILogger<ProcessCommentCommandHandler> logger)
     : IRequestHandler<ProcessCommentCommand>
 {
@@ -71,8 +73,7 @@ public class ProcessCommentCommandHandler(
         }
 
         var dailyPost = await dbContext.DailyPosts
-            .FirstOrDefaultAsync(x => x.MessageId == sourceMessage.MessageId && x.ChatId == sourceMessage.Chat.Id,
-                cancellationToken);
+            .FirstOrDefaultAsync(x => x.MessageId == sourceMessage.MessageId && x.ChatId == sourceMessage.Chat.Id, cancellationToken);
 
         if (dailyPost is null)
         {
@@ -95,6 +96,7 @@ public class ProcessCommentCommandHandler(
 
         await UpdateUserReadEntries(user.Id, dailyPost.Date, readEntries, cancellationToken);
         await UpdateDailyPostMessage(dailyPost, books, cancellationToken);
+        await mediator.Publish(new ReadIntervalsUpdatedNotification(dailyPost), cancellationToken);
     }
 
     private bool IsMessageValid(Message message, [NotNullWhen(true)] out string? text,
