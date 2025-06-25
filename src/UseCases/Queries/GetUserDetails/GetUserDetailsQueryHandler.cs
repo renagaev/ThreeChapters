@@ -17,6 +17,11 @@ public class GetUserDetailsQueryHandler(IDbContext dbContext) : IRequestHandler<
 
         var avatar = user.AvatarPath != null ? Path.GetFileName(user.AvatarPath) : null;
 
-        return new UserDetailsDto(user.Id, user.Name, user.MemberFrom, avatar);
+        return new UserDetailsDto(
+            user.Id, 
+            user.Name,
+            user.MemberFrom,
+            user.IsActive,
+            avatar);
     }
 }
