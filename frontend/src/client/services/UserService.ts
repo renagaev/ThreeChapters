@@ -75,19 +75,13 @@ export class UserService {
     }
 
     /**
-     * @param telegramId
-     * @returns number Success
+     * @returns UserDetails Success
      * @throws ApiError
      */
-    public static getUserIdByTelegramId(
-        telegramId?: number,
-    ): CancelablePromise<number> {
+    public static getCurrentUser(): CancelablePromise<UserDetails> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/users/by-telegram-id',
-            query: {
-                'telegramId': telegramId,
-            },
+            url: '/api/v1/users/currentUser',
         });
     }
 

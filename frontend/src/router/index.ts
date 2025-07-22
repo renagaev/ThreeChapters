@@ -12,9 +12,9 @@ export const routes: RouteRecordRaw[] = [
     beforeEnter: async (to, from, next) => {
       const {initDataRaw, initData} = retrieveLaunchParams();
       if (initData?.user?.id) {
-        const userId = await UserService.getUserIdByTelegramId(initData?.user?.id)
-        if (userId) {
-          next({name: 'user', params: {userId}})
+        const user = await UserService.getCurrentUser();
+        if (user != null) {
+          next({name: 'user', params: {userId: user.id!}})
           return
         }
       }
