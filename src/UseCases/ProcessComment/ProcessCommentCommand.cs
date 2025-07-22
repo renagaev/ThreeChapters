@@ -54,7 +54,6 @@ public class ProcessCommentCommandHandler(
             }
         }
 
-
         var books = await dbContext.Books.ToListAsync(cancellationToken);
 
         ICollection<ReadInterval> intervals = [];
@@ -94,7 +93,9 @@ public class ProcessCommentCommandHandler(
             })
             .ToList();
 
+        user.IsActive = true;
         await UpdateUserReadEntries(user.Id, dailyPost.Date, readEntries, cancellationToken);
+        await dbContext.SaveChangesAsync(cancellationToken);
         await UpdateDailyPostMessage(dailyPost, books, cancellationToken);
         await mediator.Publish(new ReadIntervalsUpdatedNotification(dailyPost), cancellationToken);
     }
@@ -124,8 +125,6 @@ public class ProcessCommentCommandHandler(
 
         dbContext.ReadEntries.RemoveRange(existingEntries);
         dbContext.ReadEntries.AddRange(newEntries);
-
-        await dbContext.SaveChangesAsync(ct);
     }
 
     private bool TryParseAdminCommand(string text, out string username)
