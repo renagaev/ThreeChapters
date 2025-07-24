@@ -8,6 +8,7 @@ import UserReadCalendar from "@/components/UserReadCalendar.vue";
 import {Avatar, AvatarImage} from "@/components/ui/avatar";
 import ReadProgress from "@/components/stats/BibleReadProgress.vue";
 import ReadTimes from "@/components/stats/ReadTimes.vue";
+import Streaks from "@/components/stats/Streaks.vue";
 
 const props = defineProps({
   userId: {
@@ -33,7 +34,8 @@ onBeforeMount(async () => {
     store.fetchUserDetails(props.userId).then(details => {
       user.value = details;
     }),
-    store.fetchUserBibleReadingStats(props.userId)
+    store.fetchUserBibleReadingStats(props.userId),
+    store.fetchUserStreaks(props.userId)
   ]);
 });
 const bibleProgress = computed(() => store.bibleReadProgress!)
@@ -75,6 +77,7 @@ function goBack() {
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3">
       <ReadProgress :percentage="bibleProgress.currentPercentage"></ReadProgress>
       <ReadTimes :times="bibleProgress.readTimes"></ReadTimes>
+      <Streaks :days="store.streaks.current ?? 1"></Streaks>
     </div>
     <Separator/>
     <user-read-calendar :user-id="userId"/>

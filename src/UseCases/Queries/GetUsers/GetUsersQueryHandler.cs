@@ -1,2 +1,0 @@
-namespace UseCases.Queries.GetUsers;
-

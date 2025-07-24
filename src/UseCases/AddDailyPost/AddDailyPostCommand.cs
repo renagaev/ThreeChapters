@@ -17,7 +17,6 @@ public class AddDailyPostCommandHandler(
     IDbContext dbContext,
     ILogger<AddDailyPostCommandHandler> logger,
     DailyPostRenderer dailyPostRenderer,
-    IMediator notificationPublisher,
     IOptionsSnapshot<TgSettings> options) : IRequestHandler<AddDailyPostCommand>
 {
     public async Task Handle(AddDailyPostCommand request, CancellationToken cancellationToken)
