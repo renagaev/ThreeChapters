@@ -27,16 +27,23 @@ export interface BibleReadProgress {
   readTimes: number,
   currentPercentage: number
 }
+
 const emptyBibleReadProgress: BibleReadProgress = {
   chaptersRead: new Map<number, number[]>(),
   currentPercentage: 0,
   readTimes: 0
 }
 
+export interface Streaks {
+  current: number,
+  max: number
+}
+
 export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
   const bibleReadProgress = ref<BibleReadProgress>(emptyBibleReadProgress)
+  const streaks = ref<Streaks>({current: 0, max: 0})
 
   function getAvatarUrl(path: string | null | undefined, id: number) {
     return path ?
@@ -70,6 +77,12 @@ export const useStore = defineStore('store', () => {
     }
   }
 
+  async function fetchUserStreaks(userId: number) {
+    streaks.value = {current: 0, max: 0}
+    const res = await UserService.getUserStreak(userId)
+    streaks.value = {max: res.max!!, current: res.current!!}
+  }
+
   async function fetchUserReadChaptersByDay(userId: number) {
     const res = await UserService.getUserReadChaptersByDay(userId);
     return res.map(x => ({date: new Date(x.date!), count: x.count}) as DayChaptersRead)
@@ -93,6 +106,8 @@ export const useStore = defineStore('store', () => {
     fetchBibleStructure,
     fetchUserBibleReadingStats,
     bibleReadProgress,
+    streaks,
+    fetchUserStreaks,
     fetchUserReadChaptersByDay,
     fetchUserDetails
   }

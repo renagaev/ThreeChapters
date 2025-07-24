@@ -7,6 +7,7 @@ using UseCases.Queries.GetUserDailyChaptersRead;
 using UseCases.Queries.GetUserDetails;
 using UseCases.Queries.GetUserIdByTelegramId;
 using UseCases.Queries.GetUsers;
+using UseCases.Queries.GetUserStreaks;
 
 namespace Controllers;
 
@@ -25,6 +26,10 @@ public class UserController(ISender sender) : ControllerBase
     public async Task<ICollection<DayChaptersReadDto>> GetUsersReadChaptersByDay(int userId,
         CancellationToken cancellationToken) =>
         await sender.Send(new GetUserDailyChaptersReadQuery(userId), cancellationToken);
+
+    [HttpGet("{userId:int}/streaks", Name = "getUserStreak")]
+    public async Task<ReadStreaksDto> GetUserStreak(int userId, CancellationToken cancellationToken) =>
+        await sender.Send(new GetUserStreaksQuery(userId), cancellationToken);
 
     [HttpGet("{userId:int}", Name = "getUserDetails")]
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken cancellationToken) =>
