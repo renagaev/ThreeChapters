@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as d3 from 'd3';
-import {ref, onMounted, onBeforeUnmount, watch} from 'vue';
+import {ref, onMounted, watch, nextTick} from 'vue';
 import dayjs from 'dayjs';
 import 'dayjs/locale/ru';
 
@@ -12,16 +12,16 @@ export interface Record {
 }
 
 /* ——— Параметры визуала ——— */
-const CELL = 16;   // размер ячейки
-const GAP = 3;    // промежуток между ячейками
-const RADIUS = 3;    // скругление углов
-const BLOCK_GAP = 18;   // промежуток между блоками (для подписей месяцев)
-const MARGIN_TOP = BLOCK_GAP;
-const MARGIN_L = 15;   // левый отступ под дни недели
+const CELL = 16;          // размер ячейки
+const GAP = 3;            // промежуток между ячейками
+const COL_W = CELL + GAP; // ширина колонки‑недели
+const RADIUS = 4;         // скругление углов
+const MARGIN_TOP = 20;    // отступ сверху под названия месяцев
+const LABEL_W = 16;       // ширина левой колонки с подписями дней недели
 
 /* ——— Props / Emit ——— */
 const props = defineProps<{ data: Record[] }>();
-const emit = defineEmits<{ (e: 'clicked', p: { date: number, count: number | null }): void }>();
+const emit = defineEmits<{ (e: 'clicked', p: { date: number; count: number | null }): void }>();
 
 /* ——— Палитра (tailwind-цвета) ——— */
 const colorClasses = ['bg-gray-400', 'bg-gray-600', 'bg-gray-800', 'bg-primary'];
@@ -29,81 +29,85 @@ const colorStepsRef = ref<HTMLDivElement>();
 const emptyColor = 'rgba(229,231,235,1)';
 
 function getColors() {
-  return Array.from(colorStepsRef.value!.children)
-    .map(el => getComputedStyle(el as HTMLElement).backgroundColor);
+  return Array.from(colorStepsRef.value!.children).map(el => getComputedStyle(el as HTMLElement).backgroundColor);
 }
 
-/* ——— Refs и ResizeObserver ——— */
-const containerRef = ref<HTMLDivElement>();
-const svgRef = ref<SVGSVGElement>();
-let resizeObserver: ResizeObserver | null = null;
+/* ——— Refs ——— */
+const gridSvgRef = ref<SVGSVGElement>();   // правая прокручиваемая SVG
+const leftSvgRef = ref<SVGSVGElement>();   // фиксированная SVG слева (дни недели)
+const scrollRef = ref<HTMLDivElement>();   // контейнер‑скроллер
+const fadeLeft = ref(false);
+const fadeRight = ref(false);
 
-/** Считает, сколько недель влезает по ширине контейнера */
-function computeMaxCols(): number {
-  const w = containerRef.value?.clientWidth ?? window.innerWidth;
-  const gridW = Math.max(0, w - MARGIN_L);
-  return Math.max(1, Math.floor((gridW + GAP) / (CELL + GAP)));
+/* ——— Подсобная функция: вычисляем, нужны ли фейды ——— */
+function updateFades() {
+  const el = scrollRef.value;
+  if (!el) return;
+  fadeLeft.value = el.scrollLeft > 0;
+  fadeRight.value = el.scrollLeft < el.scrollWidth - el.clientWidth - 1;
 }
 
-/** Основная функция рендера */
+/* ——— Основная функция рендера ——— */
 function render() {
-  if (!svgRef.value) return;
-  const maxCols = computeMaxCols();
+  if (!gridSvgRef.value || !leftSvgRef.value) return;
 
-  // 1) формируем map<деньUTC, count>
+  // 1) map<деньUTC, count>
   const map = new Map<number, number>();
-  props.data.forEach(r =>
-    map.set(dayjs(r.date).startOf('day').valueOf(), r.count)
-  );
+  props.data.forEach(r => map.set(dayjs(r.date).startOf('day').valueOf(), r.count));
 
-  // 2) собираем все дни от первой недели до сегодня
+  // 2) диапазон дат
   const minTs = Math.min(...map.keys());
   const firstWeekStart = dayjs(minTs).startOf('week');
   const today = dayjs().startOf('day');
 
-  type Cell = { ts: number; count: number | null; x: number; y: number; wrap: number };
+  type Cell = { ts: number; count: number | null; x: number; y: number; weekIdx: number };
   const days: Cell[] = [];
-  for (let d = firstWeekStart, i = 0;
-       d.isBefore(today) || d.isSame(today);
-       d = d.add(1, 'day'), i++
-  ) {
+  for (let d = firstWeekStart, i = 0; d.isBefore(today) || d.isSame(today); d = d.add(1, 'day'), i++) {
     const weekIdx = Math.floor(i / 7);
-    const wrap = Math.floor(weekIdx / maxCols);
-    const col = weekIdx % maxCols;
-    const rowInBlk = i % 7;
+    const row = i % 7;
     days.push({
       ts: d.valueOf(),
       count: map.get(d.valueOf()) ?? null,
-      x: MARGIN_L + col * (CELL + GAP),
-      y: MARGIN_TOP + wrap * (7 * (CELL + GAP) + BLOCK_GAP) + rowInBlk * (CELL + GAP),
-      wrap
+      x: weekIdx * COL_W,
+      y: MARGIN_TOP + row * COL_W,
+      weekIdx
     });
   }
-  const wraps = d3.max(days, d => d.wrap)! + 1;
+  const weeksCount = d3.max(days, d => d.weekIdx)! + 1;
 
   // 3) размеры SVG
-  const gridW = maxCols * (CELL + GAP) - GAP;
-  const gridH = wraps * (7 * (CELL + GAP) + BLOCK_GAP) - GAP - BLOCK_GAP;
-  const svgW = MARGIN_L + gridW;
-  const svgH = MARGIN_TOP + gridH;
+  const gridW = weeksCount * COL_W - GAP; // последняя колонка без лишнего GAP
+  const gridH = MARGIN_TOP + 7 * COL_W - GAP;
 
-  // 4) цветовая шкала
-  const counts = props.data.map(r => r.count);
-  const colorScale = d3.scaleQuantize<string>()
-    .domain([d3.min(counts)!, d3.max(counts)!])
-    .range(getColors());
+  /* 1) собираем палитру */
+  const palette = getColors();            // 4-5 оттенков
+  const emptyColor = 'rgba(229,231,235,1)';
+  const max = d3.max(props.data, d => d.count) || 1;
 
-  // 5) инициализируем SVG
-  const svg = d3.select(svgRef.value)
-    .attr('width', svgW)
-    .attr('height', svgH)
-    .attr('viewBox', `0 0 ${svgW} ${svgH}`)
+  /* symlog с «плоской» зоной ±2 глав */
+  const symlog = d3.scaleSymlog<number, number>()
+    .constant(3)
+    .domain([0, max])
+    .range([0, palette.length - 1])
+    .clamp(true);
+
+  const colorScale = (v: number | null) =>
+    v == null || v === 0
+      ? emptyColor
+      : palette[Math.floor(symlog(v))];
+
+  /* -------- SVG Сетка ---------- */
+  const gridSvg = d3.select(gridSvgRef.value)
+    .attr('width', gridW)
+    .attr('height', gridH)
+    .attr('viewBox', `0 0 ${gridW} ${gridH + 1}`)
     .style('font-family', 'sans-serif')
     .style('font-size', '9px');
-  svg.selectAll('*').remove();
-  const g = svg.append('g');
 
-  // 6) рендер ячеек
+  gridSvg.selectAll('*').remove();
+  const g = gridSvg.append('g');
+
+  // ячейки
   let selected: d3.Selection<SVGRectElement, Cell, any, any> | null = null;
 
   function setStroke(sel: d3.Selection<SVGRectElement, Cell, any, any>) {
@@ -116,10 +120,13 @@ function render() {
     .enter()
     .append('rect')
     .attr('class', 'cell')
-    .attr('x', d => d.x).attr('y', d => d.y)
-    .attr('width', CELL).attr('height', CELL)
-    .attr('rx', RADIUS).attr('ry', RADIUS)
-    .attr('fill', d => d.count === null ? emptyColor : colorScale(d.count))
+    .attr('x', d => d.x)
+    .attr('y', d => d.y)
+    .attr('width', CELL)
+    .attr('height', CELL)
+    .attr('rx', RADIUS)
+    .attr('ry', RADIUS)
+    .attr('fill', d => (d.count === null ? emptyColor : colorScale(d.count)))
     .attr('tabindex', 0)
     .on('mousedown', e => e.preventDefault())
     .on('mouseover', function () {
@@ -134,123 +141,103 @@ function render() {
       (this as SVGRectElement).blur();
     });
 
-  // 7) подписываем месяцы без наложений
-  type Label = { wrap: number; x: number; text: string; w: number };
-  // raw-labels и замер ширины
-  const raw: Label[] = [];
-  const seen = new Set<string>();
+  // подписи месяцев (первый столбец каждого месяца)
+  type Label = { x: number; text: string; w: number };
+  const labels: Label[] = [];
+  const seenMonths = new Set<number>();
   days.forEach(d => {
-    const m = dayjs(d.ts).month();
-    const key = `${d.wrap}-${m}`;
-    if (!seen.has(key)) {
-      raw.push({
-        wrap: d.wrap,
-        x: d.x + 2,
-        text: dayjs(d.ts).format('MMM'),
-        w: 0
-      });
-      seen.add(key);
+    const month = dayjs(d.ts).month();
+    if (!seenMonths.has(month)) {
+      labels.push({x: d.x + 2, text: dayjs(d.ts).format('MMM'), w: 0});
+      seenMonths.add(month);
     }
   });
-  // временно замеряем каждую
-  const measure = g.append('g').attr('class', '_measure');
-  measure.selectAll('text')
-    .data(raw)
+  // замер и фильтр перекрытий
+  const meas = g.append('g');
+  meas.selectAll('text').data(labels).enter().append('text').text(d => d.text).each(function (d) {
+    d.w = (this as SVGTextElement).getBBox().width;
+  });
+  meas.remove();
+  labels.sort((a, b) => a.x - b.x);
+  const finalLabels = labels.filter((l, i) => i === 0 || l.x > labels[i - 1].x + labels[i - 1].w + 4);
+
+  g.selectAll('text.month')
+    .data(finalLabels)
+    .join('text')
+    .attr('class', 'month')
+    .attr('x', d => d.x)
+    .attr('y', MARGIN_TOP / 2)
+    .text(d => d.text);
+
+  /* -------- SVG слева (дни недели) ---------- */
+  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const leftSvg = d3.select(leftSvgRef.value)
+    .attr('width', LABEL_W)
+    .attr('height', gridH)
+    .attr('viewBox', `0 0 ${LABEL_W} ${gridH}`)
+    .style('font-family', 'sans-serif')
+    .style('font-size', '9px');
+
+  leftSvg.selectAll('*').remove();
+  leftSvg.selectAll('text')
+    .data(weekDays)
     .enter()
     .append('text')
-    .text(d => d.text)
-    .each(function (d) {
-      d.w = (this as SVGTextElement).getBBox().width;
-    });
-  measure.remove();
-
-  // группируем по wrap и фильтруем overlap
-  const grouped = d3.group(raw, d => d.wrap);
-  const finals: Label[] = [];
-  for (const [wrap, labels] of grouped) {
-    labels.sort((a, b) => a.x - b.x);
-    const keep: Label[] = [];
-    labels.forEach(l => {
-      if (!keep.length) keep.push(l);
-      else {
-        const last = keep[keep.length - 1];
-        if (l.x <= last.x + last.w + 4) {
-          // перекрывается — заменяем «старую» на «новую»
-          keep[keep.length - 1] = l;
-        } else {
-          keep.push(l);
-        }
-      }
-    });
-    finals.push(...keep);
-  }
-
-  // render final month labels
-  const monthSel = g.selectAll<SVGTextElement, Label>('text.month')
-    .data(finals, (d: Label) => `${d.wrap}-${d.text}`);
-
-  // remove old labels
-  monthSel.exit().remove();
-
-  // append new labels
-  const monthEnter = monthSel.enter()
-    .append('text')
-    .attr('class', 'month')
-    .text((d: Label) => d.text);
-
-  // merge and set position
-  monthEnter.merge(monthSel)
-    .attr('x', (d: Label) => d.x)
-    .attr('y', (d: Label) => MARGIN_TOP + d.wrap * (7 * (CELL + GAP) + BLOCK_GAP) - BLOCK_GAP / 3);
-
-  // 8) подписи дней недели слева
-  const weekDays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  for (let w = 0; w < wraps; w++) {
-    weekDays.forEach((lbl, i) => {
-      g.append('text')
-        .attr('x', MARGIN_L - 15)
-        .attr('y', MARGIN_TOP + w * (7 * (CELL + GAP) + BLOCK_GAP) + i * (CELL + GAP) + 12)
-        .text(lbl);
-    });
-  }
+    .attr('x', LABEL_W / 2)
+    .attr('y', (_, i) => MARGIN_TOP + i * COL_W + CELL / 2 + 4)
+    .attr('text-anchor', 'middle')
+    .text(d => d);
 }
 
-/* Жизненный цикл + ResizeObserver */
-onMounted(() => {
+/* ——— Lifecycle ——— */
+onMounted(async () => {
   render();
-  if (containerRef.value) {
-    resizeObserver = new ResizeObserver(render);
-    resizeObserver.observe(containerRef.value);
+  await nextTick();
+  if (scrollRef.value) {
+    scrollRef.value.scrollLeft = scrollRef.value.scrollWidth; // к последней неделе
+    updateFades();
+    scrollRef.value.addEventListener('scroll', updateFades, {passive: true});
   }
 });
-onBeforeUnmount(() => {
-  if (resizeObserver && containerRef.value) {
-    resizeObserver.unobserve(containerRef.value);
-  }
-});
-watch(() => props.data.length, render, {immediate: true});
+watch(
+  () => props.data.length,
+  async () => {
+    render();
+    await nextTick();
+    if (scrollRef.value) {
+      scrollRef.value.scrollLeft = scrollRef.value.scrollWidth;
+      updateFades();
+    }
+  },
+  {immediate: true}
+);
 </script>
 
 <template>
-  <!-- скрытая палитра для чтения Tailwind-цветов -->
+  <!-- скрытая палитра -->
   <div ref="colorStepsRef" class="hidden">
     <div v-for="c in colorClasses" :key="c" :class="c"></div>
   </div>
 
-  <!-- контейнер, по ширине которого считается grid -->
-  <div ref="containerRef" class="overflow-auto">
-    <svg ref="svgRef" class="overflow-visible"></svg>
+  <!-- layout: фиксированная лев. колонка + скролл с fade‑масками -->
+  <div class="flex select-none">
+    <!-- левая колонка -->
+    <svg ref="leftSvgRef" class="flex-none"></svg>
+
+    <!-- скролл‑блок -->
+    <div
+      ref="scrollRef"
+      class="grid-wrapper flex-1 overflow-x-auto overflow-y-hidden relative"
+      :class="{ 'fade-left': fadeLeft, 'fade-right': fadeRight }"
+    >
+      <svg ref="gridSvgRef"></svg>
+    </div>
   </div>
 </template>
 
 <style scoped>
 svg {
   display: block;
-}
-
-/* убирать любой UA-outline, и рисовать только нашу чёрную */
-svg, svg *:focus {
-  outline: none !important;
 }
 
 .cell {
@@ -265,5 +252,41 @@ svg, svg *:focus {
 
 .month {
   font-weight: bold;
+}
+
+/* ——— Fade‑маска для горизонтального скролла ——— */
+.grid-wrapper {
+  scrollbar-width: none;
+  position: relative;
+  /* ширина полупрозрачной зоны */
+  --fade-size: 16px;
+  /* по умолчанию маска прозрачна */
+  --left-fade: 0px;
+  --right-fade: 0px;
+
+  /* маска скрывает содержимое влево/вправо постепенно */
+  --mask: linear-gradient(
+    to right,
+    transparent 0,
+    black var(--left-fade),
+    black calc(100% - var(--right-fade)),
+    transparent 100%
+  );
+
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+  /* для старых Safari, чтобы маска оставалась при скролле */
+  -webkit-mask-clip: border-box;
+  mask-clip: border-box;
+}
+
+/* включаем левый фейд */
+.fade-left {
+  --left-fade: var(--fade-size);
+}
+
+/* включаем правый фейд */
+.fade-right {
+  --right-fade: var(--fade-size);
 }
 </style>
