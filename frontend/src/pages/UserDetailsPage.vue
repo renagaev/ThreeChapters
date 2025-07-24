@@ -30,10 +30,12 @@ const router = useRouter()
 
 onBeforeMount(async () => {
   await Promise.all([
-    async () => user.value = await store.fetchUserDetails(props.userId),
-    async () => await store.fetchUserBibleReadingStats(props.userId)
-  ])
-})
+    store.fetchUserDetails(props.userId).then(details => {
+      user.value = details;
+    }),
+    store.fetchUserBibleReadingStats(props.userId)
+  ]);
+});
 const bibleProgress = computed(() => store.bibleReadProgress!)
 
 
