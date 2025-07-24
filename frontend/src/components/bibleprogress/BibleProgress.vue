@@ -5,12 +5,10 @@ import {useStore} from "@/store";
 
 const store = useStore()
 
-const props = defineProps<{ userId: number }>()
-const readChapters = ref(new Map<number, number[]>())
+const props = defineProps<{ readChapters: Map<number, number[]> }>()
 
 onMounted(async () => {
-  store.fetchBibleStructure()
-  readChapters.value = await store.fetchUserReadChaptersByBook(props.userId)
+  await store.fetchBibleStructure()
 })
 const structure = computed(() => store.bibleStructure)
 
@@ -18,7 +16,7 @@ const structure = computed(() => store.bibleStructure)
 </script>
 
 <template>
-  <div class="p-4  min-h-screen">
+  <div class="p-3  min-h-screen">
     <div
       v-for="testament in structure"
       :key="testament.title"
@@ -39,7 +37,7 @@ const structure = computed(() => store.bibleStructure)
           <BookCard
             v-for="book in group.books"
             :key="book.id"
-            :read-chapters="readChapters.get(book.id!) ?? []"
+            :read-chapters="props.readChapters.get(book.id!) ?? []"
             :total-chapters="book.chaptersCount!"
             :book-name="book.title!"
           />

@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import BibleProgress from "@/components/bibleprogress/BibleProgress.vue";
-import {ref, onBeforeMount} from "vue";
+import {ref, onBeforeMount, computed} from "vue";
 import {useStore, type UserDetails} from "@/store";
 import {Separator} from "@/components/ui/separator";
 import {useRouter} from "vue-router";
 import UserReadCalendar from "@/components/UserReadCalendar.vue";
 import {Avatar, AvatarImage} from "@/components/ui/avatar";
+import ReadProgress from "@/components/stats/BibleReadProgress.vue";
+import ReadTimes from "@/components/stats/ReadTimes.vue";
 
 const props = defineProps({
   userId: {
@@ -27,8 +29,13 @@ const store = useStore()
 const router = useRouter()
 
 onBeforeMount(async () => {
-  user.value = await store.fetchUserDetails(props.userId)
+  await Promise.all([
+    async () => user.value = await store.fetchUserDetails(props.userId),
+    async () => await store.fetchUserBibleReadingStats(props.userId)
+  ])
 })
+const bibleProgress = computed(() => store.bibleReadProgress!)
+
 
 function goBack() {
   router.push("/users")
@@ -37,7 +44,7 @@ function goBack() {
 
 <template>
   <div>
-    <div class="p-4 bg-white space-y-4">
+    <div class="p-3 bg-white space-y-4">
       <!-- Кнопка назад -->
       <button
         @click="goBack"
@@ -61,14 +68,17 @@ function goBack() {
       </div>
 
 
-
+    </div>
+    <Separator/>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3">
+      <ReadProgress :percentage="bibleProgress.currentPercentage"></ReadProgress>
+      <ReadTimes :times="bibleProgress.readTimes"></ReadTimes>
     </div>
     <Separator/>
     <user-read-calendar :user-id="userId"/>
     <Separator/>
 
-    <!-- Компонент с прогрессом чтения -->
-    <BibleProgress :user-id="props.userId"/>
+    <BibleProgress :read-chapters="bibleProgress.chaptersRead"/>
   </div>
 </template>
 
