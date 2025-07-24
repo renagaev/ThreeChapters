@@ -1,8 +1,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { BibleProgressStats } from '../models/BibleProgressStats';
 import type { DayChaptersReadDto } from '../models/DayChaptersReadDto';
-import type { ReadBookChapters } from '../models/ReadBookChapters';
+import type { ReadStreaks } from '../models/ReadStreaks';
 import type { UserDetails } from '../models/UserDetails';
 import type { UserDto } from '../models/UserDto';
 
@@ -25,15 +26,15 @@ export class UserService {
 
     /**
      * @param userId
-     * @returns ReadBookChapters Success
+     * @returns BibleProgressStats Success
      * @throws ApiError
      */
-    public static getUserReadChaptersByBook(
+    public static getUserBibleProgress(
         userId: number,
-    ): CancelablePromise<Array<ReadBookChapters>> {
+    ): CancelablePromise<BibleProgressStats> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/users/{userId}/read-chapters',
+            url: '/api/v1/users/{userId}/bible-progress',
             path: {
                 'userId': userId,
             },
@@ -51,6 +52,23 @@ export class UserService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users/{userId}/read-chapters-by-day',
+            path: {
+                'userId': userId,
+            },
+        });
+    }
+
+    /**
+     * @param userId
+     * @returns ReadStreaks Success
+     * @throws ApiError
+     */
+    public static getUserStreak(
+        userId: number,
+    ): CancelablePromise<ReadStreaks> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/{userId}/streaks',
             path: {
                 'userId': userId,
             },

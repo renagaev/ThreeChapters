@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Interfaces.DataAccess;
@@ -10,6 +11,7 @@ public interface IDbContext
     public DbSet<ReadEntry> ReadEntries { get; }
     public DbSet<SeriesMessage> SeriesMessages { get; }
     public DbSet<DailyPost> DailyPosts { get; }
+    public Task<ICollection<DateRange>> GetUserStreaks(int userId, CancellationToken cancellationToken);
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 }

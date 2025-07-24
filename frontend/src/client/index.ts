@@ -6,9 +6,11 @@ export { CancelablePromise, CancelError } from './core/CancelablePromise';
 export { OpenAPI } from './core/OpenAPI';
 export type { OpenAPIConfig } from './core/OpenAPI';
 
+export type { BibleProgressStats } from './models/BibleProgressStats';
 export type { BookGroup } from './models/BookGroup';
 export type { DayChaptersReadDto } from './models/DayChaptersReadDto';
 export type { ReadBookChapters } from './models/ReadBookChapters';
+export type { ReadStreaks } from './models/ReadStreaks';
 export type { StructureBook } from './models/StructureBook';
 export type { StructureTestament } from './models/StructureTestament';
 export type { UserDetails } from './models/UserDetails';

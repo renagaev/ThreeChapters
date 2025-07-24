@@ -43,7 +43,7 @@ function onCellClick(params: { date: number, count: number | null }) {
 </script>
 
 <template>
-  <div class="p-4">
+  <div class="p-3">
     <p class="text-base text-gray-600 mb-1"> {{ readText }} </p>
     <calendar-heatmap :data="data" @clicked="onCellClick"/>
   </div>

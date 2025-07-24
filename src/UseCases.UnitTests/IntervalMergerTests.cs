@@ -69,6 +69,17 @@ public class IntervalMergerTests
         },
         {
             [
+                // Исход 1-3, Бытие 48-50 
+                new ReadInterval(0, 48, 0, 50),
+                new ReadInterval(1, 1, 1, 3),
+            ],
+            [
+                // Бытие 48 - Исход 3
+                new ReadInterval(0, 48, 1, 3),
+            ]
+        },
+        {
+            [
                 // Бытие 48-49, Исход 1-3
                 new ReadInterval(0, 48, 0, 49),
                 new ReadInterval(1, 1, 1, 3),
