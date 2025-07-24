@@ -80,23 +80,21 @@ function render() {
   const gridH = MARGIN_TOP + 7 * COL_W - GAP;
 
   /* 1) собираем палитру */
-  const palette = getColors();      // ['rgb(…)', …] длиной 4-5
+  const palette = getColors();            // 4-5 оттенков
   const emptyColor = 'rgba(229,231,235,1)';
-
-  /* 2) максимальное значение в данных */
   const max = d3.max(props.data, d => d.count) || 1;
-  const min = d3.min(props.data, d => d.count) || 0;
 
-  /* 3) шкала symlog: отдаёт число 0…(palette.length-1) */
-  const symlog = d3.scaleSymlog()          // лог+линейная смесь
-    .domain([min, max])                      // 0 → 0, max → palette.length-1
+  /* symlog с «плоской» зоной ±2 глав */
+  const symlog = d3.scaleSymlog<number, number>()
+    .constant(3)
+    .domain([0, max])
     .range([0, palette.length - 1])
-    .clamp(true);                          // за пределы не выходит
+    .clamp(true);
 
-  /* 4) функция цвета */
   const colorScale = (v: number | null) =>
-    v == null ? emptyColor
-      : palette[Math.round(symlog(v))];
+    v == null || v === 0
+      ? emptyColor
+      : palette[Math.floor(symlog(v))];
 
   /* -------- SVG Сетка ---------- */
   const gridSvg = d3.select(gridSvgRef.value)
