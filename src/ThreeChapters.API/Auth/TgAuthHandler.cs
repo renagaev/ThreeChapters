@@ -19,6 +19,10 @@ public class TgAuthHandler(
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var twa = Request.Headers.Authorization.ToString();
+        if (twa.Length == 0)
+        {
+            return Task.FromResult(AuthenticateResult.Fail("no auth header"));
+        }
         var queryString = HttpUtility.ParseQueryString(twa);
         
         var dataDict = new SortedDictionary<string, string>(
