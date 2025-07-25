@@ -1,10 +1,10 @@
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Web;
-using Infrastructure.Interfaces.DataAccess;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Telegram.Bot.Extensions.LoginWidget;
 
@@ -13,50 +13,44 @@ namespace ThreeChapters.API.Auth;
 public class TgAuthHandler(
     IOptionsMonitor<TgAuthOptions> options,
     ILoggerFactory logger,
-    UrlEncoder encoder,
-    IMemoryCache memoryCache,
-    IDbContext dbContext)
+    UrlEncoder encoder)
     : AuthenticationHandler<TgAuthOptions>(options, logger, encoder)
 {
-    protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var twa = Request.Headers.Authorization.ToString();
         var queryString = HttpUtility.ParseQueryString(twa);
-        var dict = queryString.AllKeys
-            .Where(x => x != null)
-            .ToDictionary(key => key!, key => queryString[key]!);
+        
+        var dataDict = new SortedDictionary<string, string>(
+            queryString.AllKeys.ToDictionary(x => x!, x => queryString[x]!),
+            StringComparer.Ordinal);
+        var constantKey = "WebAppData";
+        var dataCheckString = string.Join(
+            '\n', dataDict.Where(x => x.Key != "hash")
+                .Select(x => $"{x.Key}={x.Value}"));
 
-        var widget = new LoginWidget(Options.BotToken);
-        var auth = widget.CheckAuthorization(dict);
+        var secretKey = HMACSHA256.HashData(Encoding.UTF8.GetBytes(constantKey), Encoding.UTF8.GetBytes(OptionsMonitor.CurrentValue.BotToken));
 
-        if (auth != Authorization.Valid)
+        var generatedHash = HMACSHA256.HashData(secretKey, Encoding.UTF8.GetBytes(dataCheckString));
+
+        var actualHash = Convert.FromHexString(dataDict["hash"]);
+
+        if (!actualHash.SequenceEqual(generatedHash))
         {
-            return AuthenticateResult.Fail("Invalid auth");
+            return Task.FromResult(AuthenticateResult.Fail("error"));
         }
-
-        var tgId = long.Parse(dict["id"]);
+        
+        var tgUser = JsonSerializer.Deserialize<TgUser>(dataDict["user"]);
         var claims = new List<Claim>
         {
-            new Claim("tg_id", tgId.ToString())
+            new("tg_id", tgUser!.id.ToString())
         };
-
-
-        var participant = await memoryCache.GetOrCreateAsync($"participant_{tgId}", async entry =>
-        {
-            var participant = await dbContext.Participants.FirstOrDefaultAsync(x => x.TelegramId == tgId);
-            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
-            return participant;
-        });
-
-        if (participant != null)
-        {
-            Context.Items["participant"] = participant;
-            claims.Add(new Claim("user_id", participant.Id.ToString()));
-        }
 
         var identity = new ClaimsIdentity(claims, Scheme.Name);
         var principal = new ClaimsPrincipal(identity);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
-        return AuthenticateResult.Success(ticket);
+        return Task.FromResult(AuthenticateResult.Success(ticket));
     }
+
+    private record TgUser(long id);
 }

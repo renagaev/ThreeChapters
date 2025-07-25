@@ -99,7 +99,24 @@ export class UserService {
     public static getCurrentUser(): CancelablePromise<UserDetails> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/users/currentUser',
+            url: '/api/v1/users/current',
+        });
+    }
+
+    /**
+     * @param name
+     * @returns number Success
+     * @throws ApiError
+     */
+    public static register(
+        name?: string,
+    ): CancelablePromise<number> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/users/register',
+            query: {
+                'name': name,
+            },
         });
     }
 

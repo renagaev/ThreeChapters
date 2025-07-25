@@ -1,3 +1,4 @@
+using Framework;
 using ThreeChapters.API.Auth;
 using UseCases.Settings;
 
@@ -13,6 +14,7 @@ public static class AuthenticationExtensions
         services.AddAuthentication("TWA")
             .AddScheme<TgAuthOptions, TgAuthHandler>("TWA", null);
 
+        services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
         return services;
     }
 }

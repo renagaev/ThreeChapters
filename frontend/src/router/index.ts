@@ -10,13 +10,10 @@ export const routes: RouteRecordRaw[] = [
     name: 'index',
     component: UsersPage,
     beforeEnter: async (to, from, next) => {
-      const {initDataRaw, initData} = retrieveLaunchParams();
-      if (initData?.user?.id) {
-        const user = await UserService.getCurrentUser();
-        if (user != null) {
-          next({name: 'user', params: {userId: user.id!}})
-          return
-        }
+      const user = await UserService.getCurrentUser();
+      if (user != null) {
+        next({name: 'user', params: {userId: user.id!}})
+        return
       }
       next()
     }

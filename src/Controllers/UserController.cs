@@ -10,6 +10,7 @@ using UseCases.Queries.GetUserDetails;
 using UseCases.Queries.GetUserIdByTelegramId;
 using UseCases.Queries.GetUsers;
 using UseCases.Queries.GetUserStreaks;
+using UseCases.RegisterUser;
 
 namespace Controllers;
 
@@ -36,15 +37,23 @@ public class UserController(ISender sender, ICurrentUserProvider currentUserProv
     [HttpGet("{userId:int}", Name = "getUserDetails")]
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken cancellationToken) =>
         await sender.Send(new GetUserDetailsQuery(userId), cancellationToken);
-    
+
     [Authorize]
-    [HttpGet("currentUser", Name = "getCurrentUser")]
+    [HttpGet("current", Name = "getCurrentUser")]
     public async Task<UserDetailsDto?> GetCurrentUser(CancellationToken cancellationToken)
     {
-        var currentUser = currentUserProvider.GetCurrentUser();
+        var currentUser = await currentUserProvider.GetCurrentUser();
         if (currentUser == null)
             return null;
         return await sender.Send(new GetUserDetailsQuery(currentUser.Id), cancellationToken);
+    }
+
+    [Authorize]
+    [HttpPost("register", Name = "register")]
+    public async Task<long> RegisterUser(string name)
+    {
+        var tgId = currentUserProvider.GetCurrentUserTelegramId()!.Value;
+        return await sender.Send(new RegisterUserCommand(name, tgId));
     }
 
     [HttpGet("{userId:int}/avatar/{fileName}", Name = "getUserAvatar")]

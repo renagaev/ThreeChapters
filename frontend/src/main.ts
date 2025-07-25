@@ -7,7 +7,6 @@ import App from './App.vue'
 import router from './router'
 import {errorHandler} from './errorHandler'
 import {init} from './init'
-import {publicUrl} from './helperts/publicUrl'
 
 // Mock the environment in case, we are outside Telegram.
 import './mockEnv'

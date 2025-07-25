@@ -4,6 +4,6 @@ namespace Framework;
 
 public interface ICurrentUserProvider
 {
-    Participant? GetCurrentUser();
+    Task<Participant?> GetCurrentUser();
     long? GetCurrentUserTelegramId();
 }

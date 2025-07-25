@@ -1,19 +1,21 @@
 using Domain.Entities;
 using Framework;
+using Infrastructure.Interfaces.DataAccess;
+using Microsoft.EntityFrameworkCore;
 
 namespace ThreeChapters.API.Auth;
 
-public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor) : ICurrentUserProvider
+public class CurrentUserProvider(IHttpContextAccessor httpContextAccessor, IDbContext dbContext) : ICurrentUserProvider
 {
-    public Participant? GetCurrentUser()
+    public Task<Participant?> GetCurrentUser()
     {
-        var context = httpContextAccessor.HttpContext;
-        if (context?.Items.TryGetValue("participant", out var participant) == true)
+        var tgId = GetCurrentUserTelegramId();
+        if (tgId == null)
         {
-            return participant as Participant;
+            return Task.FromResult<Participant?>(null);
         }
 
-        return null;
+        return dbContext.Participants.FirstOrDefaultAsync(x => x.TelegramId == tgId);
     }
 
     public long? GetCurrentUserTelegramId()
