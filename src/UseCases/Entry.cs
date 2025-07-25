@@ -13,6 +13,7 @@ public static class Entry
         services.AddSingleton<IIntervalParser, IntervalParser>();
         services.AddSingleton<IntervalSplitter>();
         services.AddSingleton<DailyPostRenderer>();
+        services.AddSingleton<HabitPowerCalculator>();
         return services;
     }
 }

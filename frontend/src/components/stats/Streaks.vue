@@ -24,7 +24,7 @@ const text = computed(() => {
 </script>
 
 <template>
-  <StatsCard title="Серия" :text="text" icon="nimbus:fire"/>
+  <StatsCard title="Текущая серия" :text="text" icon="nimbus:fire"/>
 </template>
 
 <style scoped>

@@ -9,6 +9,7 @@ import {Avatar, AvatarImage} from "@/components/ui/avatar";
 import ReadProgress from "@/components/stats/BibleReadProgress.vue";
 import ReadTimes from "@/components/stats/ReadTimes.vue";
 import Streaks from "@/components/stats/Streaks.vue";
+import HabitPower from "@/components/stats/HabitPower.vue";
 
 const props = defineProps({
   userId: {
@@ -35,7 +36,8 @@ onBeforeMount(async () => {
       user.value = details;
     }),
     store.fetchUserBibleReadingStats(props.userId),
-    store.fetchUserStreaks(props.userId)
+    store.fetchUserStreaks(props.userId),
+    store.fetchUserHabitPower(props.userId)
   ]);
 });
 const bibleProgress = computed(() => store.bibleReadProgress!)
@@ -75,9 +77,11 @@ function goBack() {
     </div>
     <Separator/>
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3 p-3">
-      <ReadProgress :percentage="bibleProgress.currentPercentage"></ReadProgress>
-      <ReadTimes :times="bibleProgress.readTimes"></ReadTimes>
-      <Streaks :days="store.streaks.current ?? 1"></Streaks>
+      <HabitPower :current="store.habitPower.current"/>
+      <ReadProgress :percentage="bibleProgress.currentPercentage"/>
+      <Streaks :days="store.streaks.current ?? 1"/>
+      <ReadTimes :times="bibleProgress.readTimes"/>
+
     </div>
     <Separator/>
     <user-read-calendar :user-id="userId"/>
