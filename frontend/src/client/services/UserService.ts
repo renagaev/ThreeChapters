@@ -93,18 +93,29 @@ export class UserService {
     }
 
     /**
-     * @param telegramId
+     * @returns UserDetails Success
+     * @throws ApiError
+     */
+    public static getCurrentUser(): CancelablePromise<UserDetails> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/current',
+        });
+    }
+
+    /**
+     * @param name
      * @returns number Success
      * @throws ApiError
      */
-    public static getUserIdByTelegramId(
-        telegramId?: number,
+    public static register(
+        name?: string,
     ): CancelablePromise<number> {
         return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/users/by-telegram-id',
+            method: 'POST',
+            url: '/api/v1/users/register',
             query: {
-                'telegramId': telegramId,
+                'name': name,
             },
         });
     }

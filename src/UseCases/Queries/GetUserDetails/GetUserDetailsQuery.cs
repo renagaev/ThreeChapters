@@ -2,4 +2,4 @@ using MediatR;
 
 namespace UseCases.Queries.GetUserDetails;
 
-public record GetUserDetailsQuery(int UserId) : IRequest<UserDetailsDto>;
+public record GetUserDetailsQuery(long UserId) : IRequest<UserDetailsDto>;

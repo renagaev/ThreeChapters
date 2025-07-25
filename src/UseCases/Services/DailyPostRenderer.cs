@@ -17,7 +17,7 @@ public class DailyPostRenderer(IntervalMerger merger)
         post.AppendLine();
 
         var userLines = new List<string>();
-        foreach (var user in users)
+        foreach (var user in users.Where(x=> x.MemberFrom <= date))
         {
             userLines.Add(RenderUserLine(user, books));
         }

@@ -10,13 +10,10 @@ export const routes: RouteRecordRaw[] = [
     name: 'index',
     component: UsersPage,
     beforeEnter: async (to, from, next) => {
-      const {initDataRaw, initData} = retrieveLaunchParams();
-      if (initData?.user?.id) {
-        const userId = await UserService.getUserIdByTelegramId(initData?.user?.id)
-        if (userId) {
-          next({name: 'user', params: {userId}})
-          return
-        }
+      const user = await UserService.getCurrentUser();
+      if (user != null) {
+        next({name: 'user', params: {userId: user.id!}})
+        return
       }
       next()
     }

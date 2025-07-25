@@ -10,16 +10,21 @@ const data = ref(Array.of<Record>())
 const selectedCell = ref<Record>()
 onMounted(async () => {
   data.value = (await store.fetchUserReadChaptersByDay(props.userId)) as Record[]
+  if (data.value.length == 0) {
+    data.value = [{date: new Date(), count: 0}]
+  }
+
   selectedCell.value = data.value.reduce((prev, current) => (prev && prev.date > current.date) ? prev : current)
 })
 const readText = computed(() => {
-  if(!selectedCell.value){
+  if (!selectedCell.value) {
     return ""
   }
-  const formattedDate = selectedCell.value!.date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+  const formattedDate = selectedCell.value!.date.toLocaleDateString('ru-RU', {day: 'numeric', month: 'long'})
   const count = selectedCell.value.count
   return `${formattedDate} прочитал(а) ${count} ${getChapterWord(count)}`;
 });
+
 function getChapterWord(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;

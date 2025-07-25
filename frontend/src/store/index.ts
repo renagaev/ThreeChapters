@@ -44,6 +44,7 @@ export const useStore = defineStore('store', () => {
   const bibleStructure = ref(Array.of<StructureTestament>())
   const bibleReadProgress = ref<BibleReadProgress>(emptyBibleReadProgress)
   const streaks = ref<Streaks>({current: 0, max: 0})
+  const currentUser = ref<UserDetails | null>(null)
 
   function getAvatarUrl(path: string | null | undefined, id: number) {
     return path ?
@@ -88,6 +89,22 @@ export const useStore = defineStore('store', () => {
     return res.map(x => ({date: new Date(x.date!), count: x.count}) as DayChaptersRead)
   }
 
+  async function fetchCurrentUser() {
+    const res = await UserService.getCurrentUser()
+    if (!!res) {
+      currentUser.value = {
+        avatarUrl: getAvatarUrl(res.avatar, res.id!),
+        hasAvatar: !!res.avatar,
+        name: res.name!!,
+        id: res.id!!,
+        memberFrom: new Date(res.memberFrom!!)
+      }
+    } else {
+      currentUser.value = null
+    }
+
+  }
+
   async function fetchUserDetails(userId: number): Promise<UserDetails> {
     const res = await UserService.getUserDetails(userId)
     return {
@@ -96,7 +113,13 @@ export const useStore = defineStore('store', () => {
       memberFrom: new Date(res.memberFrom!),
       hasAvatar: !!res.avatar,
       avatarUrl: getAvatarUrl(res.avatar, res.id!)
-    } as UserDetails
+    }
+  }
+
+  async function registerUser(name: string): Promise<number> {
+    const res = await UserService.register(name)
+    await fetchCurrentUser()
+    return res!
   }
 
   return {
@@ -109,6 +132,9 @@ export const useStore = defineStore('store', () => {
     streaks,
     fetchUserStreaks,
     fetchUserReadChaptersByDay,
-    fetchUserDetails
+    fetchUserDetails,
+    fetchCurrentUser,
+    registerUser,
+    currentUser
   }
 })

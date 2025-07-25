@@ -1,4 +1,6 @@
+using Framework;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using UseCases.GetUserAvatar;
@@ -8,11 +10,12 @@ using UseCases.Queries.GetUserDetails;
 using UseCases.Queries.GetUserIdByTelegramId;
 using UseCases.Queries.GetUsers;
 using UseCases.Queries.GetUserStreaks;
+using UseCases.RegisterUser;
 
 namespace Controllers;
 
 [Route("api/v1/users")]
-public class UserController(ISender sender) : ControllerBase
+public class UserController(ISender sender, ICurrentUserProvider currentUserProvider) : ControllerBase
 {
     [HttpGet(Name = "getUsers")]
     public async Task<ICollection<UserListItemDto>> GetUsersList(CancellationToken cancellationToken)
@@ -35,9 +38,23 @@ public class UserController(ISender sender) : ControllerBase
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken cancellationToken) =>
         await sender.Send(new GetUserDetailsQuery(userId), cancellationToken);
 
-    [HttpGet("by-telegram-id", Name = "getUserIdByTelegramId")]
-    public async Task<long?> GetUserIdByTelegramId(long telegramId, CancellationToken cancellationToken) =>
-        await sender.Send(new GetUserIdByTelegramIdQuery(telegramId), cancellationToken);
+    [Authorize]
+    [HttpGet("current", Name = "getCurrentUser")]
+    public async Task<UserDetailsDto?> GetCurrentUser(CancellationToken cancellationToken)
+    {
+        var currentUser = await currentUserProvider.GetCurrentUser();
+        if (currentUser == null)
+            return null;
+        return await sender.Send(new GetUserDetailsQuery(currentUser.Id), cancellationToken);
+    }
+
+    [Authorize]
+    [HttpPost("register", Name = "register")]
+    public async Task<long> RegisterUser(string name)
+    {
+        var tgId = currentUserProvider.GetCurrentUserTelegramId()!.Value;
+        return await sender.Send(new RegisterUserCommand(name, tgId));
+    }
 
     [HttpGet("{userId:int}/avatar/{fileName}", Name = "getUserAvatar")]
     [ResponseCache(Location = ResponseCacheLocation.Client, Duration = 60 * 60 * 24 * 7)]

@@ -68,7 +68,7 @@ function render() {
     days.push({
       ts: d.valueOf(),
       count: map.get(d.valueOf()) ?? null,
-      x: weekIdx * COL_W,
+      x: weekIdx * COL_W + 1,
       y: MARGIN_TOP + row * COL_W,
       weekIdx
     });
@@ -76,7 +76,7 @@ function render() {
   const weeksCount = d3.max(days, d => d.weekIdx)! + 1;
 
   // 3) размеры SVG
-  const gridW = weeksCount * COL_W - GAP; // последняя колонка без лишнего GAP
+  const gridW = Math.max(weeksCount * COL_W - GAP, 35); // последняя колонка без лишнего GAP
   const gridH = MARGIN_TOP + 7 * COL_W - GAP;
 
   /* 1) собираем палитру */
@@ -148,13 +148,13 @@ function render() {
   days.forEach(d => {
     const month = dayjs(d.ts).month();
     if (!seenMonths.has(month)) {
-      labels.push({x: d.x + 2, text: dayjs(d.ts).format('MMM'), w: 0});
+      labels.push({x: d.x, text: dayjs(d.ts).format('MMM'), w: 0});
       seenMonths.add(month);
     }
   });
   // замер и фильтр перекрытий
   const meas = g.append('g');
-  meas.selectAll('text').data(labels).enter().append('text').text(d => d.text).each(function (d) {
+  meas.selectAll('text').data(labels).enter().append('text').text(d => d.text).style('font-size', '11px').each(function (d) {
     d.w = (this as SVGTextElement).getBBox().width;
   });
   meas.remove();
@@ -165,7 +165,8 @@ function render() {
     .data(finalLabels)
     .join('text')
     .attr('class', 'month')
-    .attr('x', d => d.x)
+    .style('font-size', '11px')
+    .attr('x', d => d.x + 1)
     .attr('y', MARGIN_TOP / 2)
     .text(d => d.text);
 
@@ -176,7 +177,7 @@ function render() {
     .attr('height', gridH)
     .attr('viewBox', `0 0 ${LABEL_W} ${gridH}`)
     .style('font-family', 'sans-serif')
-    .style('font-size', '9px');
+    .style('font-size', '11px');
 
   leftSvg.selectAll('*').remove();
   leftSvg.selectAll('text')

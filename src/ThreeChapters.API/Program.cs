@@ -1,13 +1,16 @@
 using System.ComponentModel;
 using System.Reflection;
+using MediatR;
 using Microsoft.OpenApi.Models;
 using ThreeChapters.API.Extensions;
+using UseCases.AddDailyPost;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SupportNonNullableReferenceTypes();
@@ -15,7 +18,7 @@ builder.Services.AddSwaggerGen(c =>
     c.CustomSchemaIds(x =>
         x.GetCustomAttributes<DisplayNameAttribute>().SingleOrDefault()?.DisplayName ?? x.Name);
 });
-
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 
 builder.Services.AddApplicationModules(builder.Configuration);
@@ -25,6 +28,7 @@ builder.Services.AddCors(x => x.AddDefaultPolicy(policy =>
         .AllowAnyHeader()
 ));
 builder.Services.AddResponseCompression();
+builder.Services.AddTelegramAuth();
 
 var app = builder.Build();
 
@@ -38,6 +42,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
 app.MapFallbackToFile("/index.html");
 

@@ -12,10 +12,12 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
+        <PackageReference Include="Telegram.Bot.Extensions.LoginWidget" Version="1.2.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Controllers\Controllers.csproj" />
+      <ProjectReference Include="..\Framework\Framework.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.BackgroundJobs\Infrastructure.Implementation.BackgroundJobs.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.DataAccess\Infrastructure.Implementation.DataAccess.csproj" />
       <ProjectReference Include="..\Infrastructure.Implementation.S3\Infrastructure.Implementation.S3.csproj" />
