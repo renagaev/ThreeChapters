@@ -3,6 +3,7 @@
 /* eslint-disable */
 import type { BibleProgressStats } from '../models/BibleProgressStats';
 import type { DayChaptersReadDto } from '../models/DayChaptersReadDto';
+import type { HabbitPowerDto } from '../models/HabbitPowerDto';
 import type { ReadStreaks } from '../models/ReadStreaks';
 import type { UserDetails } from '../models/UserDetails';
 import type { UserDto } from '../models/UserDto';
@@ -69,6 +70,23 @@ export class UserService {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/users/{userId}/streaks',
+            path: {
+                'userId': userId,
+            },
+        });
+    }
+
+    /**
+     * @param userId
+     * @returns HabbitPowerDto Success
+     * @throws ApiError
+     */
+    public static getHabitPower(
+        userId: number,
+    ): CancelablePromise<HabbitPowerDto> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/users/{userId}/habbit-power',
             path: {
                 'userId': userId,
             },

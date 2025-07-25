@@ -9,6 +9,7 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { BibleProgressStats } from './models/BibleProgressStats';
 export type { BookGroup } from './models/BookGroup';
 export type { DayChaptersReadDto } from './models/DayChaptersReadDto';
+export type { HabbitPowerDto } from './models/HabbitPowerDto';
 export type { ReadBookChapters } from './models/ReadBookChapters';
 export type { ReadStreaks } from './models/ReadStreaks';
 export type { StructureBook } from './models/StructureBook';

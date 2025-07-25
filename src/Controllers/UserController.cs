@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using UseCases.GetUserAvatar;
+using UseCases.Queries.GetHabbitPower;
 using UseCases.Queries.GetUserBibleProgress;
 using UseCases.Queries.GetUserDailyChaptersRead;
 using UseCases.Queries.GetUserDetails;
-using UseCases.Queries.GetUserIdByTelegramId;
 using UseCases.Queries.GetUsers;
 using UseCases.Queries.GetUserStreaks;
 using UseCases.RegisterUser;
@@ -33,6 +33,10 @@ public class UserController(ISender sender, ICurrentUserProvider currentUserProv
     [HttpGet("{userId:int}/streaks", Name = "getUserStreak")]
     public async Task<ReadStreaksDto> GetUserStreak(int userId, CancellationToken cancellationToken) =>
         await sender.Send(new GetUserStreaksQuery(userId), cancellationToken);
+
+    [HttpGet("{userId:int}/habbit-power", Name = "getHabitPower")]
+    public async Task<HabbitPowerDto> GetHabitPower(int userId, CancellationToken cancellationToken) =>
+        await sender.Send(new GetHabitPowerQuery(userId), cancellationToken);
 
     [HttpGet("{userId:int}", Name = "getUserDetails")]
     public async Task<UserDetailsDto> GetUserDetails(int userId, CancellationToken cancellationToken) =>

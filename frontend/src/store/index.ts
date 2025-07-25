@@ -39,11 +39,16 @@ export interface Streaks {
   max: number
 }
 
+export interface HabitPower {
+  current: number
+}
+
 export const useStore = defineStore('store', () => {
   const users = ref(Array.of<User>())
   const bibleStructure = ref(Array.of<StructureTestament>())
   const bibleReadProgress = ref<BibleReadProgress>(emptyBibleReadProgress)
   const streaks = ref<Streaks>({current: 0, max: 0})
+  const habitPower = ref<HabitPower>({current: 0})
   const currentUser = ref<UserDetails | null>(null)
 
   function getAvatarUrl(path: string | null | undefined, id: number) {
@@ -82,6 +87,12 @@ export const useStore = defineStore('store', () => {
     streaks.value = {current: 0, max: 0}
     const res = await UserService.getUserStreak(userId)
     streaks.value = {max: res.max!!, current: res.current!!}
+  }
+
+  async function fetchUserHabitPower(userId: number) {
+    habitPower.value = {current: 0}
+    const res = await UserService.getHabitPower(userId)
+    habitPower.value = {current: res.current!!}
   }
 
   async function fetchUserReadChaptersByDay(userId: number) {
@@ -130,7 +141,9 @@ export const useStore = defineStore('store', () => {
     fetchUserBibleReadingStats,
     bibleReadProgress,
     streaks,
+    habitPower,
     fetchUserStreaks,
+    fetchUserHabitPower,
     fetchUserReadChaptersByDay,
     fetchUserDetails,
     fetchCurrentUser,
