@@ -80,8 +80,7 @@ function goBack() {
       <HabitPower :current="store.habitPower.current"/>
       <ReadProgress :percentage="bibleProgress.currentPercentage"/>
       <Streaks :days="store.streaks.current ?? 1"/>
-      <ReadTimes :times="bibleProgress.readTimes"/>
-
+      <ReadTimes v-if="bibleProgress.readTimes != 0" :times="bibleProgress.readTimes"/>
     </div>
     <Separator/>
     <user-read-calendar :user-id="userId"/>
