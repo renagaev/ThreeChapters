@@ -69,15 +69,14 @@ public class DailyPostRenderer(IntervalMerger merger)
     private string RenderStats(ICollection<Participant> participants)
     {
         var readUsers = participants.Count(x => x.ReadEntries.Count != 0);
-        var totalUsers = participants.Count;
         var totalChapters = participants
             .SelectMany(x => x.ReadEntries)
             .Sum(x => x.EndChapter - x.StartChapter + 1);
 
-        return FormatStats(readUsers, totalUsers, totalChapters);
+        return FormatStats(readUsers, totalChapters);
     }
 
-    private static string FormatStats(int readUsers, int totalUsers, int totalChapters)
+    private static string FormatStats(int readUsers, int totalChapters)
     {
         var lastDigit = totalChapters % 10;
         var lastTwoDigits = totalChapters % 100;
@@ -89,6 +88,6 @@ public class DailyPostRenderer(IntervalMerger merger)
             _ => ("глав", "прочитано")
         };
 
-        return $"{readUsers}/{totalUsers}, {read} {totalChapters} {chapters}";
+        return $"{Constants.ReadMark} x {readUsers}, {read} {totalChapters} {chapters}";
     }
 }

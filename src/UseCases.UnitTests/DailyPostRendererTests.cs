@@ -21,7 +21,7 @@ public class DailyPostRendererTests
 
                        ✅ Иван: Книга 1 3
 
-                       1/1, прочитана 1 глава
+                       ✅ x 1, прочитана 1 глава
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -41,7 +41,7 @@ public class DailyPostRendererTests
 
                        ✅ Иван: Книга 1 3-5
 
-                       1/1, прочитано 3 главы
+                       ✅ x 1, прочитано 3 главы
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -66,7 +66,7 @@ public class DailyPostRendererTests
 
                        ✅ Иван: Бытие 48 - Исход 3
 
-                       1/1, прочитано 6 глав
+                       ✅ x 1, прочитано 6 глав
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -91,7 +91,7 @@ public class DailyPostRendererTests
                        ❔ Мария
                        ✅ Петр: Книга 1 3
 
-                       2/3, прочитано 3 главы
+                       ✅ x 2, прочитано 3 главы
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -106,7 +106,7 @@ public class DailyPostRendererTests
         var expected = """
                        19 июня 2025
 
-                       0/0, прочитано 0 глав
+                       ✅ x 0, прочитано 0 глав
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -131,7 +131,7 @@ public class DailyPostRendererTests
 
                        ✅ Иван: Бытие 48-49, Исход 1-3
 
-                       1/1, прочитано 5 глав
+                       ✅ x 1, прочитано 5 глав
                        """.Trim();
 
         Assert.Equal(expected, result);
@@ -156,7 +156,7 @@ public class DailyPostRendererTests
                        ✅ Мария: Книга 1 2-3
                        ✅ Петр: Книга 1 4-6
 
-                       3/3, прочитано 6 глав
+                       ✅ x 3, прочитано 6 глав
                        """.Trim();
 
         Assert.Equal(expected, result);
