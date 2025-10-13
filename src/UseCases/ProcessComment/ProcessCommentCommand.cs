@@ -129,7 +129,7 @@ public class ProcessCommentCommandHandler(
 
     private bool TryParseAdminCommand(string text, out string username)
     {
-        var match = Regex.Match(text, @"(о|О)тметить ([А-Яа-я|\w|\s]+):.*");
+        var match = Regex.Match(text, @"[о|О]тметить ([А-Яа-я|\w|\s]+):.*");
         if (match.Success)
         {
             username = match.Groups[1].Value;
