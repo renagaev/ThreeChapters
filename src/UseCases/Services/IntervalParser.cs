@@ -81,16 +81,16 @@ public partial class IntervalParser : IIntervalParser
     private static string ReplaceBooksWithIndexes(string text, Dictionary<int, Book> books)
     {
         var sb = new StringBuilder(text.ToLower());
-        foreach (var (_, book) in books.OrderByDescending(x => x.Value.Title.Length))
+
+        var variants = books
+            .SelectMany(pair => pair.Value.TitleVariants.Select(x => (Variant: x, Book: pair.Key)))
+            .Concat(books.Select(x=> (Variant: x.Value.Title, Book: x.Key)))
+            .OrderByDescending(x => x.Variant.Length)
+            .ToList();
+        
+        foreach (var pair in variants)
         {
-            var variants = book.TitleVariants
-                .Append(book.Title)
-                .OrderByDescending(x => x.Length)
-                .ToList();
-            foreach (var variant in variants)
-            {
-                sb = sb.Replace(variant.ToLower(), $"book_{book.Id}_");
-            }
+            sb = sb.Replace(pair.Variant.ToLower(), $"book_{pair.Book}_");
         }
 
         return sb.ToString();
