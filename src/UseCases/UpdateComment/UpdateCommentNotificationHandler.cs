@@ -86,7 +86,7 @@ public class UpdateCommentNotificationHandler(
             var currentValue = pair.graph[^1].Value;
             var fire = currentValue >= 0.85m ? "🔥" : "";
             var valueFormatted = (currentValue * 100).ToString("F1") + "%";
-            rows.Add($"{pair.participant.Name.PadRight(maxLen)}| {valueFormatted.PadRight(6)}% {fire}");
+            rows.Add($"{pair.participant.Name.PadRight(maxLen)}| {valueFormatted.PadRight(6)} {fire}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
