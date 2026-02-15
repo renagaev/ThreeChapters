@@ -10,7 +10,7 @@ public class HabitPowerCalculator
             return [(today, 0)];
         }
 
-        const decimal alfa = 0.07m;
+        const decimal alfa = 0.08m;
 
         var currDate = positiveDates.Min();
 

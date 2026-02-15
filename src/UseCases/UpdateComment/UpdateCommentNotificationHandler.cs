@@ -8,15 +8,21 @@ using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using UseCases.Services;
+using UseCases.UpdateSeries;
 
-namespace UseCases.UpdateSeries;
+namespace UseCases.UpdateComment;
 
-public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotClient botClient)
+public class UpdateCommentNotificationHandler(
+    IDbContext dbContext,
+    ITelegramBotClient botClient,
+    HabitPowerCalculator powerCalculator)
     : INotificationHandler<ReadIntervalsUpdatedNotification>, IRequestHandler<PostSeriesMessageCommand>
 {
     public async Task Handle(ReadIntervalsUpdatedNotification notification, CancellationToken cancellationToken) =>
-        await UpdateSeries(notification.DailyPost.Date, notification.DailyPost.ChatId, notification.DailyPost.MessageId, cancellationToken);
-    
+        await UpdateSeries(notification.DailyPost.Date, notification.DailyPost.ChatId, notification.DailyPost.MessageId,
+            cancellationToken);
+
     public async Task Handle(PostSeriesMessageCommand request, CancellationToken cancellationToken)
     {
         var source = request.Message.ForwardOrigin as MessageOriginChannel;
@@ -35,7 +41,6 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
             {
                 return;
             }
-            
         }
 
         var exists = await dbContext.SeriesMessages.AnyAsync(x => x.Date == date, cancellationToken);
@@ -57,53 +62,34 @@ public class UpdateSeriesNotificationHandler(IDbContext dbContext, ITelegramBotC
                 dates = x.ReadEntries.Select(x => x.Date)
                     .Where(x => x <= date)
                     .Distinct()
+                    .ToList()
             }).ToListAsync(cancellationToken);
 
-        var lengths = new List<(Participant participant, int curr, int max)>();
-        foreach (var series in rawSeries)
-        {
-            var folded = series.dates.Order().Aggregate(new Stack<(DateOnly Start, DateOnly End)>(), (acc, curr) =>
+        var today = DateOnly.FromDateTime(DateTime.Today);
+        var powers = rawSeries.Select(x => new
             {
-                if (acc.Count == 0)
-                {
-                    acc.Push((curr, curr));
-                    return acc;
-                }
+                x.participant,
+                graph = powerCalculator.GetPowerGraph(x.dates, today)
+            })
+            .OrderByDescending(x => x.graph[^1].Value)
+            .ToList();
 
-                var last = acc.Pop();
-                if (last.End.AddDays(1) == curr)
-                {
-                    acc.Push((last.Start, curr));
-                    return acc;
-                }
 
-                acc.Push(last);
-                acc.Push((curr, curr));
-                return acc;
-            });
-
-            var curr = folded.FirstOrDefault(x => x.Start <= date && (x.End >= date || x.End == date.AddDays(-1)));
-            var currLength = curr == default ? 0 : curr.End.DayNumber - curr.Start.DayNumber + 1;
-            var max = folded.Count != 0 ? folded.Max(x => x.End.DayNumber - x.Start.DayNumber + 1) : 0;
-            lengths.Add((series.participant, currLength, max));
-        }
-
-        var maxLen = lengths.Max(x => x.participant.Name.Length) + 1;
+        var maxLen = powers.Max(x => x.participant.Name.Length) + 1;
         var rows = new List<string>
         {
-            $"{"Имя".PadRight(maxLen)}| Дней",
+            $"{"Имя".PadRight(maxLen)}| -",
             $"{"-".PadRight(maxLen, '-')}|----"
         };
-        foreach (var (participant, length, maxLength) in lengths.OrderBy(x => x.participant.Id))
+        foreach (var pair in powers)
         {
-            var isMax = (length == maxLength && length != 0);
-            var lenStr = length.ToString().PadRight(3);
-            if (isMax) lenStr += "🔥";
-            rows.Add($"{participant.Name.PadRight(maxLen)}| {lenStr}");
+            var currentValue = pair.graph[^1].Value;
+            var fire = currentValue >= 0.85m ? "🔥" : "";
+            rows.Add($"{pair.participant.Name.PadRight(maxLen)}| {currentValue*100:F1}% {fire}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
-        var messageText = "Серии - количество дней подряд без пропуска\n🔥- лучшая серия участника\n\n" + table;
+        var messageText = "Регулярность. Чем чаще читаешь, тем больше значение\n🔥- 85%, около трех недель без пропуска\n\n" + table;
 
         var existingMessage =
             await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
