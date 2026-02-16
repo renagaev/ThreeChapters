@@ -78,14 +78,14 @@ public class UpdateCommentNotificationHandler(
         var maxLen = powers.Max(x => x.participant.Name.Length) + 1;
         var rows = new List<string>
         {
-            $"{"Имя".PadRight(maxLen)}| -",
+            $"{"Имя".PadRight(maxLen)}| %",
             $"{"-".PadRight(maxLen, '-')}|----"
         };
         foreach (var pair in powers)
         {
             var currentValue = pair.graph[^1].Value;
             var fire = currentValue >= 0.85m ? "🔥" : "";
-            var valueFormatted = (currentValue * 100).ToString("F1") + "%";
+            var valueFormatted = (currentValue * 100).ToString("F1");
             rows.Add($"{pair.participant.Name.PadRight(maxLen)}| {valueFormatted.PadRight(6)} {fire}");
         }
 
