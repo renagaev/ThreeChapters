@@ -81,12 +81,14 @@ public class UpdateCommentNotificationHandler(
             $"{"Имя".PadRight(maxLen)}| %",
             $"{"-".PadRight(maxLen, '-')}|----"
         };
+        var number = 0;
         foreach (var pair in powers)
         {
+            number++;
             var currentValue = pair.graph[^1].Value;
             var fire = currentValue >= 0.85m ? "🔥" : "";
             var valueFormatted = (currentValue * 100).ToString("F1");
-            rows.Add($"{pair.participant.Name.PadRight(maxLen)}| {valueFormatted.PadRight(6)} {fire}");
+            rows.Add($"{number.ToString(),-2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {fire}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
