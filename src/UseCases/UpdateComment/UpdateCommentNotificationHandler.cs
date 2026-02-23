@@ -78,8 +78,8 @@ public class UpdateCommentNotificationHandler(
         var maxLen = powers.Max(x => x.participant.Name.Length) + 1;
         var rows = new List<string>
         {
-            $"{"Имя".PadRight(maxLen)}| %",
-            $"{"-".PadRight(maxLen, '-')}|----"
+            $"{"   Имя".PadRight(maxLen)}| %",
+            $"{"-".PadRight(maxLen+3, '-')}|----"
         };
         var number = 0;
         foreach (var pair in powers)
@@ -88,7 +88,7 @@ public class UpdateCommentNotificationHandler(
             var currentValue = pair.graph[^1].Value;
             var fire = currentValue >= 0.85m ? "🔥" : "";
             var valueFormatted = (currentValue * 100).ToString("F1");
-            rows.Add($"{number.ToString(),-2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {fire}");
+            rows.Add($"{number.ToString(),2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {fire}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
