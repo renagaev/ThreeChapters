@@ -17,6 +17,7 @@ public class IntervalParserTests
         {
             Id = x,
             Title = rawBooks[x].Title,
+            ChaptersCount = rawBooks[x].ChaptersCount,
             TitleVariants = rawBooks[x].TitleVariants,
         }).ToList();
         _bookDict = _books.ToDictionary(x => x.Title, x => x.Id);
@@ -128,6 +129,19 @@ public class IntervalParserTests
         // Assert
         var entry = result.Single();
         Assert.Equal(new ReadInterval(_bookDict[book], start, _bookDict[book], end), entry);
+    }
+
+    [Fact]
+    public void Should_Not_Parse_Invalid_Chapters_Count()
+    {
+        // Arrange
+        var parser = new IntervalParser();
+
+        // Act
+        var result = parser.Parse("Деяния 1-100", _books);
+
+        // Assert
+        Assert.Empty(result);
     }
 
 

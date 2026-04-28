@@ -24,9 +24,24 @@ public partial class IntervalParser : IIntervalParser
 
         return result
             .Distinct()
+            .Where(x => IsValidInterval(x, numberDict))
             .OrderBy(x => x.StartBook)
             .ThenBy(x => x.StartChapter)
             .ToList();
+    }
+
+    private bool IsValidInterval(ReadInterval interval, Dictionary<int, Book> books)
+    {
+        if (interval.StartBook == interval.EndBook)
+        {
+            var chapters = books[interval.StartBook].ChaptersCount;
+            return interval.EndChapter <= chapters;
+        }
+        else
+        {
+            var chapters = books[interval.EndBook].ChaptersCount;
+            return interval.EndChapter <= chapters;
+        }
     }
 
     [GeneratedRegex(@"book_(?<book>\d+)_[\s\:\-]+(?<chapters>\d+(?:\s*,\s*\d+)+)")]
@@ -84,10 +99,10 @@ public partial class IntervalParser : IIntervalParser
 
         var variants = books
             .SelectMany(pair => pair.Value.TitleVariants.Select(x => (Variant: x, Book: pair.Key)))
-            .Concat(books.Select(x=> (Variant: x.Value.Title, Book: x.Key)))
+            .Concat(books.Select(x => (Variant: x.Value.Title, Book: x.Key)))
             .OrderByDescending(x => x.Variant.Length)
             .ToList();
-        
+
         foreach (var pair in variants)
         {
             sb = sb.Replace(pair.Variant.ToLower(), $"book_{pair.Book}_");
