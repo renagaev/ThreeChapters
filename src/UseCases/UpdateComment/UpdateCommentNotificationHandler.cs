@@ -65,11 +65,10 @@ public class UpdateCommentNotificationHandler(
                     .ToList()
             }).ToListAsync(cancellationToken);
 
-        var today = DateOnly.FromDateTime(DateTime.Today);
         var powers = rawSeries.Select(x => new
             {
                 x.participant,
-                graph = powerCalculator.GetPowerGraph(x.dates, today)
+                graph = powerCalculator.GetPowerGraph(x.dates, date)
             })
             .OrderByDescending(x => x.graph[^1].Value)
             .ToList();
