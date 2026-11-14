@@ -86,7 +86,12 @@ public class UpdateCommentNotificationHandler(
         {
             number++;
             var currentValue = pair.graph[^1].Value;
-            var fire = currentValue >= 0.85m ? "🔥" : "";
+            var icon = currentValue switch
+            {
+                >= 0.70m => "🔥",
+                < 0.30m and >= 0.05m => "🌱",
+                _ => ""
+            };
             var valueFormatted = (currentValue * 100).ToString("F1");
             rows.Add($"{number.ToString(),2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {fire}");
         }
