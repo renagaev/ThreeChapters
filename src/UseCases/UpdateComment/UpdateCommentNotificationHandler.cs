@@ -93,11 +93,11 @@ public class UpdateCommentNotificationHandler(
                 _ => ""
             };
             var valueFormatted = (currentValue * 100).ToString("F1");
-            rows.Add($"{number.ToString(),2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {fire}");
+            rows.Add($"{number.ToString(),2} {pair.participant.Name.PadRight(maxLen)}| {valueFormatted,-6} {icon}");
         }
 
         var table = string.Join("\n", rows.Select(x => $"`{x}`"));
-        var messageText = "Регулярность. Чем чаще читаешь, тем больше значение\n🔥- 85%, около трех недель без пропуска\n\n" + table;
+        var messageText = "Регулярность. Чем чаще читаешь, тем больше значение\n🔥- от 70%, это чтение примерно 5 дней из 7\n\n" + table;
 
         var existingMessage =
             await dbContext.SeriesMessages.FirstOrDefaultAsync(x => x.Date == date, cancellationToken);
